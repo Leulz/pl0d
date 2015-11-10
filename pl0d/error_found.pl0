@@ -1,0 +1,7 @@
+const m=7,n=85,z='Q';
+var x,y;
+
+begin
+  x:=m; y:=n;
+  write x; write z; write 'k'; writeln;
+end.

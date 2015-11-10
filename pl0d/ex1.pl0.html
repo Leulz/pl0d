@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+<TITLE>compiled source program</TITLE>
+</HEAD>
+<BODY>
+<PRE>
+
+
+  (Keyword, 'function')  (funcId, 'multiply') (Symbol, '(') (parId, 'x') (Symbol, ',')  (parId, 'y') (Symbol, ')') 
+     (Keyword, 'var')  (varId, 'a') (Symbol, ',') (varId, 'b') (Symbol, ',') (varId, 'c') (Symbol, ';') 
+    (Keyword, 'begin') 
+      (varId, 'a') (Symbol, ':=') (parId, 'x') (Symbol, ';')  (varId, 'b') (Symbol, ':=') (parId, 'y') (Symbol, ';')  (varId, 'c') (Symbol, ':=') (number, '0') (Symbol, ';') 
+      (Keyword, 'while')  (varId, 'b') (Symbol, '>') (number, '0')  (Keyword, 'do') 
+        (Keyword, 'begin') 
+          (Keyword, 'if')  (Keyword, 'odd')  (varId, 'b')  (Keyword, 'then')  (varId, 'c') (Symbol, ':=') (varId, 'c') (Symbol, '+') (varId, 'a') (Symbol, ';') 
+          (varId, 'a') (Symbol, ':=') (number, '2') (Symbol, '*') (varId, 'a') (Symbol, ';')  (varId, 'b') (Symbol, ':=') (varId, 'b') (Symbol, '/') (number, '2') (Symbol, ';') 
+        (Keyword, 'end') (Symbol, ';') 
+      (Keyword, 'return')  (varId, 'c') (Symbol, ';') 
+    (Keyword, 'end') (Symbol, ';') 
+
+(Keyword, 'const')  (constId, 'm') (Symbol, '=') (number, '7') (Symbol, ',') (constId, 'n') (Symbol, '=') (number, '85') (Symbol, ',') (constId, 'z') (Symbol, '=') (character, ''Q'') (Symbol, ';') 
+(Keyword, 'var')  (varId, 'x') (Symbol, ',') (varId, 'y') (Symbol, ';') 
+
+(Keyword, 'begin') 
+  (varId, 'x') (Symbol, ':=') (constId, 'm') (Symbol, ';')  (varId, 'y') (Symbol, ':=') (constId, 'n') (Symbol, ';') 
+  (Keyword, 'write')  (varId, 'x') (Symbol, ';')  (Keyword, 'write')  (constCharId, 'z') (Symbol, ';')  (Keyword, 'write')  (character, ''k'') (Symbol, ';')  (Keyword, 'writeln') (Symbol, ';') 
+(Keyword, 'end') (Symbol, '.') 
+</PRE>
+</BODY>
+</HTML>
