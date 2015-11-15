@@ -3,6 +3,10 @@ var x;
 
 begin
   x:=10;
-  do begin x := x - 1; end; while x > 11;
+  do
+    begin 
+      x := x - 1;
+    end
+  while x > 11;
   write x; writeln;
 end.

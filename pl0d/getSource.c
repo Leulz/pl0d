@@ -52,6 +52,9 @@ static struct keyWd KeyWdT[] = {	/* The table containing reserved words, symbols
 	{"odd", Odd},
 	{"write", Write},
 	{"writeln",WriteLn},
+	{"repeat", Repeat},
+	{"until", Until},
+	{"else", Else},
 	{"$dummy1",end_of_KeyWd},
 							/* The table containing symbols and names (KeyId) */
 	{"+", Plus},

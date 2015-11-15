@@ -15,6 +15,8 @@ typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	Ret, Func, 
 	Var, Const, Odd,
 	Write, WriteLn,
+	Repeat, Until,
+	Else,
 	end_of_KeyWd,				/* The end of reserved words */
 	Plus, Minus,				/* Operators and delimiters*/
 	Mult, Div,	

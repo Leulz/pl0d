@@ -190,11 +190,6 @@ int val(int ti)					/* It returns the value of the i-th element in the name tabl
 	return nameTable[ti].u.value;
 }
 
-char ch(int ti)                 /* It returns the character of the i-th element in the name table. */
-{
-	return nameTable[ti].u.value + '0';
-}
-
 int pars(int ti)				/* It returns the number of parameters of a function (the i-th element in the name table). */
 {
 	return nameTable[ti].u.f.pars;

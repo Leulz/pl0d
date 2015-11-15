@@ -14,8 +14,6 @@
 
 static Token token;				/* The next token */
 
-int isDo = 0, doBack1, doBack2;
-
 static void block(int pIndex);	/* It compiles a block */
 						/* pIndex is the index of the function name of this block */
 static void constDecl();			/* It compiles a constant declaration. */
@@ -48,7 +46,7 @@ void block(int pIndex)		/* pIndex is the index of the function name of this bloc
 {
 	int backP;
 	backP = genCodeV(jmp, 0);		/* It generates a jmp to skip internal functions. The address will be adjusted by backpatch. */
-	while (1) {				/* It repeatedly compiles declaratins. */
+	while (1) {				/* It repeatedly compiles declarations. */
 		switch (token.kind){
 		case Const:			/* A constant declaration */
 			token = nextToken();
@@ -202,6 +200,13 @@ void statement()			/* It compiles a statement. */
 			backP = genCodeV(jpc, 0);			/* A conditional jump */
 			statement();					/* A statement just after "then" */
 			backPatch(backP);				/* It adjusts the target address of the conditional jump. */
+			if (token.kind == Else) {
+				token = nextToken();
+				backP2 = genCodeV(jmp, 0);
+				backPatch(backP);
+				statement();
+				backPatch(backP2);
+			}
 			return;
 		case Ret:					/* A return statement */
 			token = nextToken();
@@ -219,13 +224,6 @@ void statement()			/* It compiles a statement. */
 					}
 					if (token.kind==End){			/* If the next token is "end", it is the end of the begin-end statement. */
 						token = nextToken();
-						if (isDo) {
-							token = nextToken();
-							token = checkGet(token, While);
-							condition(1);
-							doBack1 = genCodeV(jpc, doBack1);
-							isDo = 0;
-						}
 						return;
 					}
 					if (isStBeginKey(token)){		/* If the next token is one of the starting symbols of statements, */
@@ -248,10 +246,19 @@ void statement()			/* It compiles a statement. */
 			return;
 		case Do:
 			token = nextToken();
-			doBack1 = nextCode();
-			isDo = 1;
+			backP = nextCode();
 			statement();
-			
+			token = checkGet(token, While);
+			condition(1);
+			genCodeV(jpc, backP);
+			return;
+		case Repeat:
+			token = nextToken();
+			backP = nextCode();
+			statement();
+			token = checkGet(token, Until);
+			condition(0);
+			genCodeV(jpc, backP);
 			return;
 		case Write:			/* A write-statement */
 			token = nextToken();
@@ -361,7 +368,7 @@ Type factor()					/* It compiles a factor of an expression. */
 			genCodeV(lit, val(tIndex));
 			token = nextToken(); break;
 		case constCharId:
-			genCodeV(lit, ch(tIndex) - '0');
+			genCodeV(lit, (val(tIndex) + '0') - '0');
 			token = nextToken(); break;
 		case funcId:					/* A function call */
 			token = nextToken();
