@@ -201,7 +201,7 @@ void block(int pIndex)		/* pIndex is the index of the function name of this bloc
 	}			
 	backPatch(backP);			/* It adjusts the target address of the jmp to skip internal functions. */
 	changeV(pIndex, nextCode());	/* It adjusts the starting address of this function. */
-	genCodeV(ict, frameL());		/* A code to occupy the frame of this block on the stack. */
+	genCodeV(ict, frameL() * 10);		/* A code to occupy the frame of this block on the stack. */
 	statement();				/* The main statement of this block */		
 	genCodeR();				/* The return code */
 	blockEnd();				/* It declares the end of a block to the name table. */
@@ -350,9 +350,9 @@ void statement()			/* It compiles a statement. */
 			} else {*/
 				token = checkGet(token, Assign);
 				if (token.kind == Lbracket) {
-					/*setKindT(tIndex, varArrayId);
+					setKindT(tIndex, varArrayId);
 					token = nextToken();
-					int arraySize = 0, array[MAXARRAY], switchFlag = 0;
+					int arraySize = 1, array[MAXARRAY], switchFlag = 0;
 					while(1 && !switchFlag) {
 						switch(token.kind) {
 							case Num:
@@ -366,7 +366,8 @@ void statement()			/* It compiles a statement. */
 								break;
 						}
 					}
-					setVarArray(tIndex, arraySize, array);*/
+					array[0] = arraySize - 1;
+					genCodeArr(array, tIndex);
 				} else {
 					expression();					/* It compiles an expression. */
 					genCodeT(sto, tIndex);	  /* A code to store the right-hand value in the left-hand variable */
@@ -548,11 +549,14 @@ Type factor()					/* It compiles a factor of an expression. */
 			genCodeT(lod, tIndex);
 			token = nextToken(); break;
 		case varArrayId:
+			//TODO check if the index is bigger than 9
 			;
-			//temp = token;
+			temp = token;
 			token = checkGet(nextToken(), Lbracket);
-			/*tIndex = searchT(temp.u.id, varArrayId);
-			arrayElement = getVarArrayElement(tIndex, token.u.value);
+			tIndex = searchT(temp.u.id, varArrayId);
+			printf("tindex is %d token.u.value is %d\n", tIndex, token.u.value);
+			genCodeLarr(token.u.value, tIndex);
+			/*arrayElement = getVarArrayElement(tIndex, token.u.value);
 			genCodeV(lit, arrayElement);*/
 			token = checkGet(nextToken(), Rbracket);
 			break;

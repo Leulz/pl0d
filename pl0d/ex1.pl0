@@ -1,6 +1,17 @@
+ function multiply(x, y)
+     var a,b,c;
+    begin
+      a:=x; b:=y; c:=0;
+      while b>0 do
+        begin
+          if odd b then c:=c+a;
+          a:=2*a; b:=b/2;
+        end;
+      return c;
+    end; 
 
 const x=11,y=15,z=[23,24,25];
-var a;
+var c, a, d, b;
 
 begin
   a:=y;
@@ -8,11 +19,13 @@ begin
   writeln;
   write a;
   writeln;
+  c:=[11,22,33,44,55,66,77,88];
   a:=x;
   write a;
   writeln;
-  
-  begin
-    write 111; writeln;
-  end
+  b:=a;
+  write multiply(a,b);
+  writeln;
+  writeln;
+  write c[4];
 end.

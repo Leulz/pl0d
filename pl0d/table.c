@@ -111,8 +111,11 @@ int enterTvar(char *id)			/* It records a variable name in the name table. */
 	enterT(id);
 	nameTable[tIndex].kind = varId;
 	nameTable[tIndex].u.raddr.level = level;
-	nameTable[tIndex].u.raddr.addr = localAddr++;
-	nameTable[tIndex].u.raddr.offset = 0;
+	if (localAddr == 2) { /* If it is the first variable in the main block */
+		nameTable[tIndex].u.raddr.addr = localAddr++;
+	} else {
+		nameTable[tIndex].u.raddr.addr = localAddr+= 11;		
+	}
 	return tIndex;
 }
 
@@ -231,11 +234,6 @@ void setVarArrayElement(int ti, int arrayIndex, int value)
 	nameTable[ti].u.v.array[arrayIndex + 1] = value;
 }
 
-void setKindT(int ti, KindT kind)
-{
-	nameTable[ti].kind = kind;
-}
-
 void setVarArray(int ti, int arraySize, int array[])
 {
 	int i;
@@ -245,3 +243,8 @@ void setVarArray(int ti, int arraySize, int array[])
 		nameTable[ti].u.v.array[i] = array[i-1];
 	}
 }*/
+
+void setKindT(int ti, KindT kind)
+{
+	nameTable[ti].kind = kind;
+}

@@ -17,6 +17,12 @@
 typedef struct inst{				/* An instruction code */
 	OpCode  opCode;
 	union{
+		struct{
+			RelAddr addr;
+			union {
+				int arr[11], offset;
+			}u;
+		}arr;
 		RelAddr addr;
 		int value;
 		Operator optr;
@@ -67,6 +73,29 @@ int genCodeR()					/*　It generates a return code */
 	code[cIndex].opCode = ret;
 	code[cIndex].u.addr.level = bLevel();
 	code[cIndex].u.addr.addr = fPars();	/*　The number of parameters, which will be used to release a stack frame. */
+	return cIndex;
+}
+
+int genCodeArr(int arr[], int ti)
+{
+	checkMax();
+	code[cIndex].opCode = starr;
+	code[cIndex].u.arr.addr = relAddr(ti);
+	int arrSize = arr[0], i;
+	code[cIndex].u.arr.u.arr[0] = arrSize;
+	for (i = 1; i < arrSize + 1 && i < 11; ++i)
+	{
+		code[cIndex].u.arr.u.arr[i] = arr[i];
+	}
+	return cIndex;
+}
+
+int genCodeLarr(int arrIndex, int ti)
+{
+	checkMax();
+	code[cIndex].opCode = lodar;
+	code[cIndex].u.arr.addr = relAddr(ti);
+	code[cIndex].u.arr.u.offset = arrIndex + 1;
 	return cIndex;
 }
 
@@ -193,10 +222,22 @@ void execute()			/* It executes generated codes */
 		switch(i.opCode){
 		case lit: stack[top++] = i.u.value; 
 				break;
-		case lod: stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr + i.u.addr.offset]; 
+		case lod: stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr]; 
 				 break;
-		case sto: stack[display[i.u.addr.level] + i.u.addr.addr + i.u.addr.offset] = stack[--top]; 
+		case lodar:
+				 stack[top++] = stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + i.u.arr.u.offset]; 
 				 break;
+		case sto: stack[display[i.u.addr.level] + i.u.addr.addr] = stack[--top]; 
+				 break;
+		case starr:
+				  ;
+				  int arrSize = i.u.arr.u.arr[0], ind;
+				  stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr] = arrSize;
+				  for (ind = 1; ind < arrSize + 1 && arrSize < 11; ++ind)
+				  {
+				  	stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + ind] = i.u.arr.u.arr[ind];
+				  }
+				  break;
 		case cal: lev = i.u.addr.level +1;	/* The level of the name of a callee is i.u.addr.level */
 		  /* The level of the body of the callee is i.u.addr.level+1. */
 				stack[top] = display[lev]; 	/*　It preserves display[lev] in stack[top]　*/

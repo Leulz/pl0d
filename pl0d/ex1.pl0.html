@@ -5,9 +5,20 @@
 <BODY>
 <PRE>
 
+ (Keyword, 'function')  (funcId, 'multiply') (Symbol, '(') (parId, 'x') (Symbol, ',')  (parId, 'y') (Symbol, ')') 
+     (Keyword, 'var')  (varId, 'a') (Symbol, ',') (varId, 'b') (Symbol, ',') (varId, 'c') (Symbol, ';') 
+    (Keyword, 'begin') 
+      (varId, 'a') (Symbol, ':=') (parId, 'x') (Symbol, ';')  (varId, 'b') (Symbol, ':=') (parId, 'y') (Symbol, ';')  (varId, 'c') (Symbol, ':=') (number, '0') (Symbol, ';') 
+      (Keyword, 'while')  (varId, 'b') (Symbol, '>') (number, '0')  (Keyword, 'do') 
+        (Keyword, 'begin') 
+          (Keyword, 'if')  (Keyword, 'odd')  (varId, 'b')  (Keyword, 'then')  (varId, 'c') (Symbol, ':=') (varId, 'c') (Symbol, '+') (varId, 'a') (Symbol, ';') 
+          (varId, 'a') (Symbol, ':=') (number, '2') (Symbol, '*') (varId, 'a') (Symbol, ';')  (varId, 'b') (Symbol, ':=') (varId, 'b') (Symbol, '/') (number, '2') (Symbol, ';') 
+        (Keyword, 'end') (Symbol, ';') 
+      (Keyword, 'return')  (varId, 'c') (Symbol, ';') 
+    (Keyword, 'end') (Symbol, ';') 
 
 (Keyword, 'const')  (constId, 'x') (Symbol, '=') (number, '11') (Symbol, ',') (constId, 'y') (Symbol, '=') (number, '15') (Symbol, ',') (constId, 'z') (Symbol, '=') (Symbol, '[') (number, '23') (Symbol, ',') (number, '24') (Symbol, ',') (number, '25') (Symbol, ']') (Symbol, ';') 
-(Keyword, 'var')  (varId, 'a') (Symbol, ';') 
+(Keyword, 'var')  (varId, 'c') (Symbol, ',')  (varId, 'a') (Symbol, ',')  (varId, 'b') (Symbol, ';') 
 
 (Keyword, 'begin') 
   (varId, 'a') (Symbol, ':=') (constId, 'y') (Symbol, ';') 
@@ -15,13 +26,15 @@
   (Keyword, 'writeln') (Symbol, ';') 
   (Keyword, 'write')  (varId, 'a') (Symbol, ';') 
   (Keyword, 'writeln') (Symbol, ';') 
+  (varId, 'c') (Symbol, ':=') (Symbol, '[') (number, '11') (Symbol, ',') (number, '22') (Symbol, ',') (number, '33') (Symbol, ',') (number, '44') (Symbol, ',') (number, '55') (Symbol, ',') (number, '66') (Symbol, ',') (number, '77') (Symbol, ',') (number, '88') (Symbol, ']') (Symbol, ';') 
   (varId, 'a') (Symbol, ':=') (constId, 'x') (Symbol, ';') 
   (Keyword, 'write')  (varId, 'a') (Symbol, ';') 
   (Keyword, 'writeln') (Symbol, ';') 
-
-  (Keyword, 'begin') 
-    (Keyword, 'write')  (number, '111') (Symbol, ';')  (Keyword, 'writeln') (Symbol, ';') 
-  (Keyword, 'end') 
+  (varId, 'b') (Symbol, ':=') (varId, 'a') (Symbol, ';') 
+  (Keyword, 'write')  (funcId, 'multiply') (Symbol, '(') (varId, 'a') (Symbol, ',') (varId, 'b') (Symbol, ')') (Symbol, ';') 
+  (Keyword, 'writeln') (Symbol, ';') 
+  (Keyword, 'writeln') (Symbol, ';') 
+  (Keyword, 'write')  (Symbol, '[') (number, '4') (Symbol, ']') (Symbol, ';') 
 (Keyword, 'end') (Symbol, '.') 
 </PRE>
 </BODY>

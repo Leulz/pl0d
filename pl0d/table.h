@@ -7,7 +7,6 @@ typedef enum kindT {		/* Kinds of identifiers */
 typedef struct relAddr{		/* The structure for variables, parameters and function addresses */
 	int level;
 	int addr;
-	int offset;
 }RelAddr; 
 
 void blockBegin(int firstAddr);	/* It is called when a block starts. */
@@ -29,8 +28,8 @@ RelAddr relAddr(int ti);		/* It returns the address of the i-th element in the n
 int val(int ti);				/* It returns the value of the i-th element in the name table. */
 /*int getArrayElement(int ti, int arrayIndex);
 void setVarArray(int ti, int arraySize, int array[]);
-void setVarArrayElement(int ti, int arrayIndex, int value);
-void setKindT(int ti, KindT kind);*/
+void setVarArrayElement(int ti, int arrayIndex, int value);*/
+void setKindT(int ti, KindT kind);
 int pars(int ti);				/* It returns the number of parameters of a function (the i-th element in the name table). */
 int frameL();				/* The maximum relative address of variables in a block */
 
