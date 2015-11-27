@@ -11,6 +11,7 @@
 
 #define MINERROR 3			/* It will execute object codes if the number of errors in the compilation is less than MINERROR. */
 #define FIRSTADDR 2			/* The address of the first variable of each block. */
+#define MAXARRAY 10
 
 static Token token;				/* The next token */
 
@@ -25,6 +26,142 @@ static Type term();				/* It compiles a term of an expression. */
 static Type factor();				/* It compiles a fcator of an expression. */
 static void condition(int invert);			/* It compiles a conditional expression. */
 static int isStBeginKey(Token t);		/* Is a token t one of starting tokens of statements? */
+
+//Put this in a helper.c/util.c ?
+/* Used for getting the string representation of a KeyId value. Useful for debugging. */
+char* getKeyIdName(KeyId k) 
+{
+	switch(k) {
+		case Begin:
+			return "Begin";
+			break;
+		case End:
+			return "End";
+			break;
+		case If:
+			return "If";
+			break;
+		case Then:
+			return "Then";
+			break;
+		case While:
+			return "While";
+			break;
+		case Do:
+			return "Do";
+			break;
+		case Ret:
+			return "Ret";
+			break;
+		case Func:
+			return "Func";
+			break;
+		case Var:
+			return "Var";
+			break;
+		case Const:
+			return "Const";
+			break;
+		case Write:
+			return "Write";
+			break;
+		case WriteLn:
+			return "WriteLn";
+			break;
+		case end_of_KeyWd:
+			return "end_of_KeyWd";
+			break;
+		case Plus:
+			return "Plus";
+			break;
+		case Minus:
+			return "Minus";
+			break;
+		case Mult:
+			return "Mult";
+			break;
+		case Div:
+			return "Div";
+			break;
+		case Apostrophe:
+			return "Apostrophe";
+			break;
+		case Lparen:
+			return "Lparen";
+			break;
+		case Rparen:
+			return "Rparen";
+			break;
+		case Lbracket:
+			return "Lbracket";
+			break;
+		case Rbracket:
+			return "Rbracket";
+			break;
+		case Equal:
+			return "Equal";
+			break;
+		case Lss:
+			return "Lss";
+			break;
+		case Gtr:
+			return "Gtr";
+			break;
+		case NotEq:
+			return "NotEq";
+			break;
+		case LssEq:
+			return "LssEq";
+			break;
+		case GtrEq:
+			return "GtrEq";
+			break;
+		case Comma:
+			return "Comma";
+			break;
+		case Period:
+			return "Period";
+			break;
+		case Semicolon:
+			return "Semicolon";
+			break;
+		case Assign:
+			return "Assign";
+			break;
+		case end_of_KeySym:
+			return "end_of_KeySym";
+			break;
+		case Id:
+			return "Id";
+			break;
+		case Num:
+			return "Num";
+			break;
+		case nul:
+			return "nul";
+			break;
+		case end_of_Token:
+			return "end_of_Token";
+			break;
+		case letter:
+			return "letter";
+			break;
+		case digit:
+			return "digit";
+			break;
+		case colon:
+			return "colon";
+			break;
+		case character:
+			return "character";
+			break;
+		case others:
+			return "others";
+			break;
+		default:
+			return "Not identified.";
+	}
+}
 
 int compile()
 {
@@ -73,37 +210,50 @@ void block(int pIndex)		/* pIndex is the index of the function name of this bloc
 void constDecl()			/* It compiles a constant declaration. */
 {
 	Token temp;
-	int flag = 0;
+	int flag = 0, arrayFlag = 0;
 	while(1){
 		if (token.kind==Id){
 			setIdKind(constId);				/* It sets the kind of the token for printing. */
 			temp = token; 					/* It records the name of the token. */
 			token = checkGet(nextToken(), Equal);		/* The next token should be "=". */
 
+			//TODO Change this chain of if-else into a switch.
 			if (token.kind==Num)
 				enterTconst(temp.u.id, token.u.value);	/* It records both the constant name and its value in the name table. */
 			else if (token.kind == character){
 				enterTcharConst(temp.u.id, token.u.value);
-			} /*else if (token.kind == Id) { //This whole error handling can get very messy, since to know if it's a character instead of
-											 //an Id you have to know what follows the character. If I can't have a lookahead, I can't know
-											 //for sure what to do, so just let it be a critical error for now.
-				errorInsert(Apostrophe);
-				token.kind = character;
-				if (strlen(token.u.id) != 1) {
-					errorMessage("too many characters");
+			} else if (token.kind == Lbracket) {
+				arrayFlag = 1;
+				token = nextToken();
+				int arraySize = 0, array[MAXARRAY], switchFlag = 0;
+				while(1 && !switchFlag) {
+					switch(token.kind) {
+						case Num:
+							array[arraySize++] = token.u.value;
+						case Comma:
+							token = nextToken();
+							continue;
+						default:
+							switchFlag = 1;
+							token = checkGet(token, Rbracket);
+							break;
+					}
 				}
-				skipChar(); //FIXME Should check if it's an apostrophe
-				enterTcharConst(temp.u.id, token.u.id[0] - '0');
-				flag = 1;
-			}*/
+				enterTarrayConst(temp.u.id, array, arraySize);
+			}
 			else{
 				errorType("number nor char");
 			}
 			if (flag) {
 				setcTokenKind(character);
 				setcTokenValue(token.u.id[0] - '0');
+				flag = 0;
 			}
-			token = nextToken();
+			if (arrayFlag) {
+				arrayFlag = 0;
+			} else {
+				token = nextToken();				
+			}
 		}else
 			errorMissingId();
 		if (token.kind!=Comma){		/* If the next token is a comma, it will be followed by a constant declaration. */
@@ -187,11 +337,43 @@ void statement()			/* It compiles a statement. */
 		case Id:					/* An assignment statement */
 			tIndex = searchT(token.u.id, varId);	/* The index of a left-hand variable */
 			setIdKind(k=kindT(tIndex));		/* It sets the kind of the left-hand variable for printing. */
-			if (k != varId && k != parId) 		/* The left-hand variable must be a variable or a parameter. */
-				errorType("var/par");
-			token = checkGet(nextToken(), Assign);			/* It must be ":=". */
-			expression();					/* It compiles an expression. */
-			genCodeT(sto, tIndex);	  /* A code to store the right-hand value in the left-hand variable */
+			if (k != varId && k != parId && k != varArrayId) 		/* The left-hand variable must be a variable or a parameter. */
+				errorType("var/par/varArray");
+			token = nextToken();
+			/*if (token.kind == Lbracket) {
+				token = nextToken();
+				int arrayIndex = token.u.value;
+				token = checkGet(nextToken(), Rbracket);
+				token = checkGet(token, Assign);
+				int newArrayElement = token.u.value;
+				setVarArrayElement(tIndex, arrayIndex, newArrayElement);
+			} else {*/
+				token = checkGet(token, Assign);
+				if (token.kind == Lbracket) {
+					/*setKindT(tIndex, varArrayId);
+					token = nextToken();
+					int arraySize = 0, array[MAXARRAY], switchFlag = 0;
+					while(1 && !switchFlag) {
+						switch(token.kind) {
+							case Num:
+								array[arraySize++] = token.u.value;
+							case Comma:
+								token = nextToken();
+								continue;
+							default:
+								switchFlag = 1;
+								token = checkGet(token, Rbracket);
+								break;
+						}
+					}
+					setVarArray(tIndex, arraySize, array);*/
+				} else {
+					expression();					/* It compiles an expression. */
+					genCodeT(sto, tIndex);	  /* A code to store the right-hand value in the left-hand variable */
+				}
+			//}
+			//token = checkGet(nextToken(), Assign);			/* It must be ":=". */
+			
 			return;
 		case If:					/* An if-statement */
 			token = nextToken();
@@ -353,10 +535,11 @@ Type term()					/* It compiles a term of an expression. */
 
 Type factor()					/* It compiles a factor of an expression. */
 {
-	int tIndex, i;
+	int tIndex, i, arrayElement;
 	KindT kind;
 	KeyId k = token.kind;
 	Type type;
+	Token temp;
 	if (token.kind==Id){
 		tIndex = searchT(token.u.id, varId);
 		setIdKind(kind=kindT(tIndex));		/* It sets the kind of the identifier for printing. */
@@ -364,12 +547,30 @@ Type factor()					/* It compiles a factor of an expression. */
 		case varId: case parId:			/* The name of a variable or the name of a parameter */
 			genCodeT(lod, tIndex);
 			token = nextToken(); break;
+		case varArrayId:
+			;
+			//temp = token;
+			token = checkGet(nextToken(), Lbracket);
+			/*tIndex = searchT(temp.u.id, varArrayId);
+			arrayElement = getVarArrayElement(tIndex, token.u.value);
+			genCodeV(lit, arrayElement);*/
+			token = checkGet(nextToken(), Rbracket);
+			break;
 		case constId:					/* The name of a constant */
 			genCodeV(lit, val(tIndex));
 			token = nextToken(); break;
 		case constCharId:
 			genCodeV(lit, (val(tIndex) + '0') - '0');
 			token = nextToken(); break;
+		case constArrayId:
+			;
+			temp = token;
+			token = checkGet(nextToken(), Lbracket);
+			tIndex = searchT(temp.u.id, constArrayId);
+			arrayElement = getArrayElement(tIndex, token.u.value);
+			genCodeV(lit, arrayElement);
+			token = checkGet(nextToken(), Rbracket);
+			break;
 		case funcId:					/* A function call */
 			token = nextToken();
 			if (token.kind==Lparen){
@@ -408,6 +609,7 @@ Type factor()					/* It compiles a factor of an expression. */
 		token = nextToken();
 		k = character;
 	}
+
 	switch (token.kind){					/* It declares an error if this factor is followed by a factor. */
 	case Id: case Num: case Lparen:
 		errorMissingOp();
@@ -459,4 +661,3 @@ void condition(int invert)					/* It compiles a conditional expression. */
 			}
 	}
 }
-

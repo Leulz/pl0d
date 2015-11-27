@@ -10,6 +10,7 @@
 #define MAXTABLE 100		/* The maximum length of the name table */
 #define MAXNAME  31		/* The maximum length of names */
 #define MAXLEVEL 5		/* The maximum nesting block level */
+#define MAXARRAY 10
 
 typedef struct tableE {		/* The structure of elements in the name table */
 	KindT kind;			/* Kinds of names */
@@ -21,6 +22,7 @@ typedef struct tableE {		/* The structure of elements in the name table */
 			int pars;		/*¡¡The number of parameters if it is a function */
 		}f;
 		RelAddr raddr;		/*¡¡The address if it is a variable or a parameter */
+		int array[MAXARRAY + 1]; /* The array, if it is an array. The first value is the size of the array. */
 	}u;
 }TabelE;
 
@@ -110,6 +112,7 @@ int enterTvar(char *id)			/* It records a variable name in the name table. */
 	nameTable[tIndex].kind = varId;
 	nameTable[tIndex].u.raddr.level = level;
 	nameTable[tIndex].u.raddr.addr = localAddr++;
+	nameTable[tIndex].u.raddr.offset = 0;
 	return tIndex;
 }
 
@@ -126,6 +129,19 @@ int enterTcharConst(char *id, int ch) /* It records a character constant and its
 	enterT(id);
 	nameTable[tIndex].kind = constCharId;
 	nameTable[tIndex].u.value = ch;
+	return tIndex;
+}
+
+int enterTarrayConst(char *id, int arr[], int arrSize)
+{
+	int i;
+	enterT(id);
+	nameTable[tIndex].kind = constArrayId;
+	nameTable[tIndex].u.array[0] = arrSize;
+	for (i = 1; i < arrSize + 1; ++i)
+	{
+		nameTable[tIndex].u.array[i] = arr[i - 1];
+	}
 	return tIndex;
 }
 
@@ -200,3 +216,32 @@ int frameL()				/* The maximum relative address of variables in a block */
 	return localAddr;
 }
 
+int getArrayElement(int ti, int arrayIndex)
+{
+	return nameTable[ti].u.array[arrayIndex + 1];
+}
+
+/*int getVarArrayElement(int ti, int arrayIndex)
+{
+	return nameTable[ti].u.v.array[arrayIndex + 1];
+}
+
+void setVarArrayElement(int ti, int arrayIndex, int value)
+{
+	nameTable[ti].u.v.array[arrayIndex + 1] = value;
+}
+
+void setKindT(int ti, KindT kind)
+{
+	nameTable[ti].kind = kind;
+}
+
+void setVarArray(int ti, int arraySize, int array[])
+{
+	int i;
+	nameTable[ti].u.v.array[0] = arraySize;
+	for (i = 1; i < arraySize + 1; ++i)
+	{
+		nameTable[ti].u.v.array[i] = array[i-1];
+	}
+}*/

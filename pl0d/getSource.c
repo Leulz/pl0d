@@ -64,6 +64,8 @@ static struct keyWd KeyWdT[] = {	/* The table containing reserved words, symbols
 	{"'", Apostrophe},
 	{"(", Lparen},
 	{")", Rparen},
+	{"[", Lbracket},
+	{"]", Rbracket},
 	{"=", Equal},
 	{"<", Lss},
 	{">", Gtr},
@@ -105,6 +107,7 @@ static void initCharClassT()		/* It initializes the table containing kinds of ch
 	charClassT['+'] = Plus; charClassT['-'] = Minus;
 	charClassT['*'] = Mult; charClassT['/'] = Div;
 	charClassT['('] = Lparen; charClassT[')'] = Rparen;
+	charClassT['['] = Lbracket; charClassT[']'] = Rbracket;
 	charClassT['='] = Equal; charClassT['<'] = Lss;
 	charClassT['>'] = Gtr; charClassT[','] = Comma;
 	charClassT['.'] = Period; charClassT[';'] = Semicolon;
@@ -481,7 +484,7 @@ Token nextToken()			/* It returns the next token. */
 		
 		if (strlen(charString) == 0) { //Empty character.
 			temp.u.value = '\0' - '0';
-		} else if (strlen(charString) != 1){ //TODO Should probably create a "critical error" or something, and throw it here.
+		} else if (strlen(charString) != 1){
 			//errorMessage("should be only zero or one character");
 		}
 		

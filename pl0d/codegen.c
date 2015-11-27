@@ -10,7 +10,7 @@
 #include "getSource.h"
 
 #define MAXCODE 200			/* The maximum length of codes */
-#define MAXMEM 2000			/* The maximum length of the stack */
+#define MAXMEM 20000			/* The maximum length of the stack */
 #define MAXREG 20			/* The maximum number of registers used at a time*/
 #define MAXLEVEL 5			/* The maximum block nesting level */
 
@@ -193,16 +193,16 @@ void execute()			/* It executes generated codes */
 		switch(i.opCode){
 		case lit: stack[top++] = i.u.value; 
 				break;
-		case lod: stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr]; 
+		case lod: stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr + i.u.addr.offset]; 
 				 break;
-		case sto: stack[display[i.u.addr.level] + i.u.addr.addr] = stack[--top]; 
+		case sto: stack[display[i.u.addr.level] + i.u.addr.addr + i.u.addr.offset] = stack[--top]; 
 				 break;
 		case cal: lev = i.u.addr.level +1;	/* The level of the name of a callee is i.u.addr.level */
 		  /* The level of the body of the callee is i.u.addr.level+1. */
 				stack[top] = display[lev]; 	/*¡¡It preserves display[lev] in stack[top]¡¡*/
 				stack[top+1] = pc; display[lev] = top; /* The stack frame of a callee starts at top. */
 				pc = i.u.addr.addr;
-				 break;
+				break;
 		case ret: temp = stack[--top];		/* It preserves a return value into a variable temp. */
 				top = display[i.u.addr.level];  	/* It restores top. */
 				display[i.u.addr.level] = stack[top];		/* It resotres a display. */

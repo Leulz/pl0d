@@ -1,12 +1,11 @@
 typedef struct {
 		int a;
-		char b;
+		int b[a];
 	}s;
 
 int main(void) {
-	int a = 40, b = 40;
-
-	printf("%d\n", a!=b);
+	s str;
+	str.a = 10;
 
 	return 0;
 }

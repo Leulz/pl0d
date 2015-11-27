@@ -7,6 +7,7 @@
 #endif
  
 #define MAXNAME 31			/* The maximum length of names */
+#define MAXARRAY 10         /* The maximum length of arrays */
  
 typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	Begin, End,				/* Reserved words */
@@ -22,6 +23,7 @@ typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	Mult, Div,	
 	Apostrophe,
 	Lparen, Rparen,
+	Lbracket, Rbracket,
 	Equal, Lss, Gtr,
 	NotEq, LssEq, GtrEq, 
 	Comma, Period, Semicolon,
@@ -31,136 +33,6 @@ typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	end_of_Token,
 	letter, digit, colon, character, others		/* Other characters */
 } KeyId;
-
-//Put this in a helper.c/util.c ?
-/* Used for getting the string representation of a KeyId value. Useful for debugging. */
-/*char* getKeyIdName(KeyId k) 
-{
-	switch(k) {
-		case Begin:
-			return "Begin";
-			break;
-		case End:
-			return "End";
-			break;
-		case If:
-			return "If";
-			break;
-		case Then:
-			return "Then";
-			break;
-		case While:
-			return "While";
-			break;
-		case Do:
-			return "Do";
-			break;
-		case Ret:
-			return "Ret";
-			break;
-		case Func:
-			return "Func";
-			break;
-		case Var:
-			return "Var";
-			break;
-		case Const:
-			return "Const";
-			break;
-		case Write:
-			return "Write";
-			break;
-		case WriteLn:
-			return "WriteLn";
-			break;
-		case end_of_KeyWd:
-			return "end_of_KeyWd";
-			break;
-		case Plus:
-			return "Plus";
-			break;
-		case Minus:
-			return "Minus";
-			break;
-		case Mult:
-			return "Mult";
-			break;
-		case Div:
-			return "Div";
-			break;
-		case Apostrophe:
-			return "Apostrophe";
-			break;
-		case Lparen:
-			return "Lparen";
-			break;
-		case Rparen:
-			return "Rparen";
-			break;
-		case Equal:
-			return "Equal";
-			break;
-		case Lss:
-			return "Lss";
-			break;
-		case Gtr:
-			return "Gtr";
-			break;
-		case NotEq:
-			return "NotEq";
-			break;
-		case LssEq:
-			return "LssEq";
-			break;
-		case GtrEq:
-			return "GtrEq";
-			break;
-		case Comma:
-			return "Comma";
-			break;
-		case Period:
-			return "Period";
-			break;
-		case Semicolon:
-			return "Semicolon";
-			break;
-		case Assign:
-			return "Assign";
-			break;
-		case end_of_KeySym:
-			return "end_of_KeySym";
-			break;
-		case Id:
-			return "Id";
-			break;
-		case Num:
-			return "Num";
-			break;
-		case nul:
-			return "nul";
-			break;
-		case end_of_Token:
-			return "end_of_Token";
-			break;
-		case letter:
-			return "letter";
-			break;
-		case digit:
-			return "digit";
-			break;
-		case colon:
-			return "colon";
-			break;
-		case character:
-			return "character";
-			break;
-		case others:
-			return "others";
-			break;
-		default:
-			return "Not identified.";
-	}
-};*/
 
 typedef struct type { /* For knowing what is the type of an expression, a term or a factor. */
 	KeyId keyId;
