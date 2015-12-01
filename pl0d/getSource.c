@@ -47,6 +47,7 @@ static struct keyWd KeyWdT[] = {	/* The table containing reserved words, symbols
 	{"do", Do},
 	{"return", Ret},
 	{"function", Func},
+	{"call", Call},
 	{"var", Var},
 	{"const", Const},
 	{"odd", Odd},
@@ -485,7 +486,7 @@ Token nextToken()			/* It returns the next token. */
 		if (strlen(charString) == 0) { //Empty character.
 			temp.u.value = '\0' - '0';
 		} else if (strlen(charString) != 1){
-			//errorMessage("should be only zero or one character");
+			//FIXME errorMessage("should be only zero or one character");
 		}
 		
 		temp.u.value = charString[0] - '0';
@@ -496,9 +497,9 @@ Token nextToken()			/* It returns the next token. */
 			printcToken();
 			errorInsert(Apostrophe);
 			flag = 1;
-		}
-		else
+		} else {
 			ch = nextChar();
+		}
 		break;
 	default:
 		temp.kind = cc;

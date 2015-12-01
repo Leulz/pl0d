@@ -2,7 +2,7 @@
  /***********table.h***********/
 
 typedef enum kindT {		/* Kinds of identifiers */
-	varId, varArrayId, funcId, parId, constId, constCharId, constArrayId
+	varId, varArrayId, varCharId, funcId, parId, constId, constCharId, constArrayId
 }KindT;
 typedef struct relAddr{		/* The structure for variables, parameters and function addresses */
 	int level;

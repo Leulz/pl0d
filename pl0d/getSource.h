@@ -13,7 +13,7 @@ typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	Begin, End,				/* Reserved words */
 	If, Then,
 	While, Do,
-	Ret, Func, 
+	Ret, Func, Call, 
 	Var, Const, Odd,
 	Write, WriteLn,
 	Repeat, Until,

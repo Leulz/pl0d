@@ -90,10 +90,10 @@ int genCodeArr(int arr[], int ti)
 	return cIndex;
 }
 
-int genCodeLarr(int arrIndex, int ti)
+int genCodeLarr(int arrIndex, int ti, OpCode op)
 {
 	checkMax();
-	code[cIndex].opCode = lodar;
+	code[cIndex].opCode = op;
 	code[cIndex].u.arr.addr = relAddr(ti);
 	code[cIndex].u.arr.u.offset = arrIndex + 1;
 	return cIndex;
@@ -238,6 +238,8 @@ void execute()			/* It executes generated codes */
 				  	stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + ind] = i.u.arr.u.arr[ind];
 				  }
 				  break;
+		case stelar: stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + i.u.arr.u.offset] = stack[--top]; 
+				 break;
 		case cal: lev = i.u.addr.level +1;	/* The level of the name of a callee is i.u.addr.level */
 		  /* The level of the body of the callee is i.u.addr.level+1. */
 				stack[top] = display[lev]; 	/*¡¡It preserves display[lev] in stack[top]¡¡*/

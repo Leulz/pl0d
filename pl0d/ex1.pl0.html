@@ -18,7 +18,7 @@
     (Keyword, 'end') (Symbol, ';') 
 
 (Keyword, 'const')  (constId, 'x') (Symbol, '=') (number, '11') (Symbol, ',') (constId, 'y') (Symbol, '=') (number, '15') (Symbol, ',') (constId, 'z') (Symbol, '=') (Symbol, '[') (number, '23') (Symbol, ',') (number, '24') (Symbol, ',') (number, '25') (Symbol, ']') (Symbol, ';') 
-(Keyword, 'var')  (varId, 'c') (Symbol, ',')  (varId, 'a') (Symbol, ',')  (varId, 'b') (Symbol, ';') 
+(Keyword, 'var')  (varId, 'c') (Symbol, ',')  (varId, 'a') (Symbol, ',')  (varId, 'd') (Symbol, ',')  (varId, 'b') (Symbol, ';') 
 
 (Keyword, 'begin') 
   (varId, 'a') (Symbol, ':=') (constId, 'y') (Symbol, ';') 
@@ -33,8 +33,15 @@
   (varId, 'b') (Symbol, ':=') (varId, 'a') (Symbol, ';') 
   (Keyword, 'write')  (funcId, 'multiply') (Symbol, '(') (varId, 'a') (Symbol, ',') (varId, 'b') (Symbol, ')') (Symbol, ';') 
   (Keyword, 'writeln') (Symbol, ';') 
-  (Keyword, 'writeln') (Symbol, ';') 
   (Keyword, 'write')  (Symbol, '[') (number, '4') (Symbol, ']') (Symbol, ';') 
+  (Keyword, 'writeln') (Symbol, ';') 
+  (Symbol, '[') (number, '4') (Symbol, ']') (Symbol, ':=') (constId, 'x') (Symbol, '+') (constId, 'y') (Symbol, ';') 
+  (Keyword, 'write')  (Symbol, '[') (number, '4') (Symbol, ']') (Symbol, ';') 
+  (Keyword, 'writeln') (Symbol, ';') 
+  (Keyword, 'write')  (funcId, 'multiply') (Symbol, '(') (Symbol, '[') (number, '5') (Symbol, ']') (Symbol, ',') (Symbol, '[') (number, '0') (Symbol, ']') (Symbol, ')') (Symbol, ';') 
+  (Keyword, 'writeln') (Symbol, ';') 
+  (varId, 'd') (Symbol, ':=') (character, ''I'') (Symbol, ';') 
+  (Keyword, 'write')  (Symbol, ';') 
 (Keyword, 'end') (Symbol, '.') 
 </PRE>
 </BODY>

@@ -26,6 +26,13 @@ begin
   b:=a;
   write multiply(a,b);
   writeln;
-  writeln;
   write c[4];
+  writeln;
+  c[4]:=x+y;
+  write c[4];
+  writeln;
+  write multiply(c[5],c[0]);
+  writeln;
+  d:='I';
+  write d;
 end.

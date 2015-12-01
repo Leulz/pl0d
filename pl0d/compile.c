@@ -328,26 +328,29 @@ void funcDecl()			/* It compiles a function declaration. */
 
 void statement()			/* It compiles a statement. */
 {
+	Token temp;
 	int tIndex;
 	KindT k;
 	int backP, backP2;	/* Variables to record addresses of codes whose address parts must be adjusted later */
 
 	while(1) {
 		switch (token.kind) {
-		case Id:					/* An assignment statement */
-			tIndex = searchT(token.u.id, varId);	/* The index of a left-hand variable */
+			//FIXME This tIndex is only correct the first time. If you keep changing the type of the variable, the search won't work.
+		case Id:					/* An assignment statement := */
+			tIndex = searchT(token.u.id, token.kind);	/* The index of a left-hand variable */
 			setIdKind(k=kindT(tIndex));		/* It sets the kind of the left-hand variable for printing. */
 			if (k != varId && k != parId && k != varArrayId) 		/* The left-hand variable must be a variable or a parameter. */
 				errorType("var/par/varArray");
+			temp = token;
 			token = nextToken();
-			/*if (token.kind == Lbracket) {
+			if (token.kind == Lbracket) {
 				token = nextToken();
 				int arrayIndex = token.u.value;
 				token = checkGet(nextToken(), Rbracket);
 				token = checkGet(token, Assign);
-				int newArrayElement = token.u.value;
-				setVarArrayElement(tIndex, arrayIndex, newArrayElement);
-			} else {*/
+				expression();
+				genCodeLarr(arrayIndex, tIndex, stelar);
+			} else {
 				token = checkGet(token, Assign);
 				if (token.kind == Lbracket) {
 					setKindT(tIndex, varArrayId);
@@ -369,12 +372,13 @@ void statement()			/* It compiles a statement. */
 					array[0] = arraySize - 1;
 					genCodeArr(array, tIndex);
 				} else {
-					expression();					/* It compiles an expression. */
+					Type type = expression();					/* It compiles an expression. */
+					if (type.keyId == character) {
+						setKindT(tIndex, varCharId);
+					}
 					genCodeT(sto, tIndex);	  /* A code to store the right-hand value in the left-hand variable */
 				}
-			//}
-			//token = checkGet(nextToken(), Assign);			/* It must be ":=". */
-			
+			}
 			return;
 		case If:					/* An if-statement */
 			token = nextToken();
@@ -449,7 +453,7 @@ void statement()			/* It compiles a statement. */
 			switch(end.keyId) {
 				case Id:
 					switch(end.kindT){
-						case constCharId:
+						case constCharId: case varCharId:
 							genCodeO(wrtc);
 							break;
 						default:
@@ -470,6 +474,33 @@ void statement()			/* It compiles a statement. */
 			genCodeO(wrl);				/* A code to write a new line¡¡*/
 			return;
 		case End: case Semicolon:			/* An empty statement */
+			return;
+		case Call:
+			token = nextToken();
+			tIndex = searchT(token.u.id, funcId);
+			token = nextToken();
+			if (token.kind==Lparen){
+				int i=0; 					/* The number of arguments */
+				token = nextToken();
+				if (token.kind != Rparen) {
+					for (; ; ) {
+						expression(); i++;	/* It compiles an argument. */
+						if (token.kind==Comma){	/* If the next token is a comma, it will be followed by an argument. */
+							token = nextToken();
+							continue;
+						}
+						token = checkGet(token, Rparen);
+						break;
+					}
+				} else
+					token = nextToken();
+				if (pars(tIndex) != i) 
+					errorMessage("\\#par");	/* pars(tIndex) is the number of parameters. */
+			}else{
+				errorInsert(Lparen);
+				errorInsert(Rparen);
+			}
+			genCodeT(cal, tIndex);				/* A code to call a function */
 			return;
 		default:			      /* It ignores tokens preceeding a starting token of statements */
 			errorDelete();				/* It ignores tokens. */
@@ -545,7 +576,7 @@ Type factor()					/* It compiles a factor of an expression. */
 		tIndex = searchT(token.u.id, varId);
 		setIdKind(kind=kindT(tIndex));		/* It sets the kind of the identifier for printing. */
 		switch (kind) {
-		case varId: case parId:			/* The name of a variable or the name of a parameter */
+		case varId: case parId:	case varCharId:		/* The name of a variable or the name of a parameter */
 			genCodeT(lod, tIndex);
 			token = nextToken(); break;
 		case varArrayId:
@@ -554,8 +585,7 @@ Type factor()					/* It compiles a factor of an expression. */
 			temp = token;
 			token = checkGet(nextToken(), Lbracket);
 			tIndex = searchT(temp.u.id, varArrayId);
-			printf("tindex is %d token.u.value is %d\n", tIndex, token.u.value);
-			genCodeLarr(token.u.value, tIndex);
+			genCodeLarr(token.u.value, tIndex, lodar);
 			/*arrayElement = getVarArrayElement(tIndex, token.u.value);
 			genCodeV(lit, arrayElement);*/
 			token = checkGet(nextToken(), Rbracket);

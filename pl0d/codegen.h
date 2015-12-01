@@ -2,7 +2,7 @@
    /******************** codegen.h ********************/
 
 typedef enum codes{			/* Constants for operation codes (opecodes) */
-	lit, opr, lod, sto, cal, ret, ict, jmp, jpc, starr, lodar
+	lit, opr, lod, sto, cal, ret, ict, jmp, jpc, starr, lodar, stelar
 }OpCode;
 
 typedef enum ops{			/* Constants for operators */
@@ -15,7 +15,7 @@ int genCodeT(OpCode op, int ti);		/* It generates a code with an operand pointed
 int genCodeO(Operator p);			/* It generates a code of an operator p*/
 int genCodeR();					/*¡¡It generates a return code */
 int genCodeArr(int arr[], int ti);
-int genCodeLarr(int arrIndex, int ti);
+int genCodeLarr(int arrIndex, int ti, OpCode op);
 void backPatch(int i);			/* It puts an address where a next code will be genereted into a code at an address i. */
 
 int nextCode();			/* It returns an address where a next code will be generated. */
