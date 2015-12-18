@@ -2,7 +2,7 @@
  /***********table.h***********/
 
 typedef enum kindT {		/* Kinds of identifiers */
-	varId, varArrayId, varCharId, funcId, parId, constId, constCharId, constArrayId
+	varId, funcId, parId, constId
 }KindT;
 typedef struct relAddr{		/* The structure for variables, parameters and function addresses */
 	int level;
@@ -26,10 +26,6 @@ KindT kindT(int i);			/* It returns the kind of the i-th element in the name tab
 
 RelAddr relAddr(int ti);		/* It returns the address of the i-th element in the name table. */
 int val(int ti);				/* It returns the value of the i-th element in the name table. */
-/*int getArrayElement(int ti, int arrayIndex);
-void setVarArray(int ti, int arraySize, int array[]);
-void setVarArrayElement(int ti, int arrayIndex, int value);*/
-void setKindT(int ti, KindT kind);
 int pars(int ti);				/* It returns the number of parameters of a function (the i-th element in the name table). */
 int frameL();				/* The maximum relative address of variables in a block */
 

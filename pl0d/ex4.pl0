@@ -1,8 +1,0 @@
-
-var x;
-
-begin
-  x:=0;
-  if x = 0 then write 1111 else write 22222;
-  writeln;
-end.
