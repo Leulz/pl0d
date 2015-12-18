@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "getSource.h"
 
 #define MAXLINE 120		/* The maximum line length */
@@ -46,19 +47,26 @@ static struct keyWd KeyWdT[] = {	/* The table containing reserved words, symbols
 	{"do", Do},
 	{"return", Ret},
 	{"function", Func},
+	{"call", Call},
 	{"var", Var},
 	{"const", Const},
 	{"odd", Odd},
 	{"write", Write},
 	{"writeln",WriteLn},
+	{"repeat", Repeat},
+	{"until", Until},
+	{"else", Else},
 	{"$dummy1",end_of_KeyWd},
 							/* The table containing symbols and names (KeyId) */
 	{"+", Plus},
 	{"-", Minus},
 	{"*", Mult},
 	{"/", Div},
+	{"'", Apostrophe},
 	{"(", Lparen},
 	{")", Rparen},
+	{"[", Lbracket},
+	{"]", Rbracket},
 	{"=", Equal},
 	{"<", Lss},
 	{">", Gtr},
@@ -100,10 +108,11 @@ static void initCharClassT()		/* It initializes the table containing kinds of ch
 	charClassT['+'] = Plus; charClassT['-'] = Minus;
 	charClassT['*'] = Mult; charClassT['/'] = Div;
 	charClassT['('] = Lparen; charClassT[')'] = Rparen;
+	charClassT['['] = Lbracket; charClassT[']'] = Rbracket;
 	charClassT['='] = Equal; charClassT['<'] = Lss;
 	charClassT['>'] = Gtr; charClassT[','] = Comma;
 	charClassT['.'] = Period; charClassT[';'] = Semicolon;
-	charClassT[':'] = colon;
+	charClassT[':'] = colon; charClassT['\''] = Apostrophe;
 }
 
 int openSource(char fileName[]) 		/* It opens a source file. */
@@ -380,7 +389,7 @@ char nextChar()				/* It returns the next character. */
 Token nextToken()			/* It returns the next token. */
 {
 	int i = 0;
-	int num;
+	int num, flag = 0;
 	KeyId cc;
 	Token temp;
 	char ident[MAXNAME];
@@ -398,6 +407,7 @@ Token nextToken()			/* It returns the next token. */
 		ch = nextChar();
 	}
 	switch (cc = charClassT[ch]) {
+		//TODO Check here if the last char is ', if it is call errorDelete
 	case letter: 				/* identifier */
 		do {
 			if (i < MAXNAME)
@@ -461,11 +471,43 @@ Token nextToken()			/* It returns the next token. */
 			temp.kind = Gtr;
 			break;
 		}
+	case Apostrophe:
+		;
+		char charString[MAXNAME];
+		ch = nextChar();
+		while(charClassT[ch] == letter || charClassT[ch] == digit) {
+			if (i < MAXNAME)
+				charString[i] = ch;
+			i++; ch = nextChar();
+		}
+
+		temp.kind = character;
+		
+		if (strlen(charString) == 0) { //Empty character.
+			temp.u.value = '\0' - '0';
+		} else if (strlen(charString) != 1){
+			//FIXME errorMessage("should be only zero or one character");
+		}
+		
+		temp.u.value = charString[0] - '0';
+
+		if (ch != '\''){
+			cToken=temp;
+			printed=0;
+			printcToken();
+			errorInsert(Apostrophe);
+			flag = 1;
+		} else {
+			ch = nextChar();
+		}
+		break;
 	default:
 		temp.kind = cc;
 		ch = nextChar(); break;
 	}
-	cToken = temp; printed = 0;
+	cToken = temp; 
+	if (!flag)
+		printed = 0;
 	return temp;
 }
 
@@ -549,6 +591,7 @@ void printcToken()				/* It prints the current token. */
 		fprintf(fptex, "(Symbol, '%s') ", KeyWdT[i].word);
 	} else if (i==(int)Id){							/*　Identfier　*/
 		switch (idKind) {
+		//refactor
 		case varId: 
 			fprintf(fptex, "(varId, '%s') ", cToken.u.id); return;
 		case parId: 
@@ -557,9 +600,13 @@ void printcToken()				/* It prints the current token. */
 			fprintf(fptex, "(funcId, '%s') ", cToken.u.id); return;
 		case constId: 
 			fprintf(fptex, "(constId, '%s') ", cToken.u.id); return;
+		case constCharId: 
+			fprintf(fptex, "(constCharId, '%s') ", cToken.u.id); return;
 		}
 	}else if (i==(int)Num) {		/*　Num　*/
 		fprintf(fptex, "(number, '%d') ", cToken.u.value);
+	} else if (i==(int)character) {
+		fprintf(fptex, "(character, \''%c'\') ", cToken.u.value + '0');
 	}
 #else
 	if (i < end_of_KeyWd) {						/* A reserved word */
@@ -583,10 +630,27 @@ void printcToken()				/* It prints the current token. */
 #endif
 }
 
+void skipChar() /* Skips the current char. Used for error handling. */
+{
+	ch = nextChar();
+}
+
 void setIdKind (KindT k)		 /* It sets the kind of the current token (id) for the html (or tex) file. */
 {
 	idKind = k;
 }
 
+Token getcToken()
+{
+	return cToken;
+}
 
+void setcTokenKind (KeyId k) /* It sets the kind of the current token FOR ERROR HANDLING PURPOSES ONLY */
+{
+	cToken.kind = k;
+}
 
+void setcTokenValue(int value) /* It sets the value of the current token FOR ERROR HANDLING PURPOSES ONLY */
+{
+	cToken.u.value = value;
+}

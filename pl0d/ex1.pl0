@@ -1,5 +1,4 @@
-
-  function multiply(x, y)
+ function multiply(x, y)
      var a,b,c;
     begin
       a:=x; b:=y; c:=0;
@@ -7,15 +6,33 @@
         begin
           if odd b then c:=c+a;
           a:=2*a; b:=b/2;
-        end
+        end;
       return c;
     end; 
 
-const m=7,n=85;
-var x,y;
+const x=11,y=15,z=[23,24,25];
+var c, a, d, b;
 
 begin
-  x:=m; y:=n; 
-  write x; write y; writeln; write multiply(x,y); writeln
+  a:=y;
+  write z[0];
+  writeln;
+  write a;
+  writeln;
+  c:=[11,22,33,44,55,66,77,88];
+  a:=x;
+  write a;
+  writeln;
+  b:=a;
+  write multiply(a,b);
+  writeln;
+  write c[4];
+  writeln;
+  c[4]:=x+y;
+  write c[4];
+  writeln;
+  write multiply(c[5],c[0]);
+  writeln;
+  d:='I';
+  write d;
 end.
-

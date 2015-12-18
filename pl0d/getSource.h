@@ -7,18 +7,23 @@
 #endif
  
 #define MAXNAME 31			/* The maximum length of names */
+#define MAXARRAY 10         /* The maximum length of arrays */
  
 typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	Begin, End,				/* Reserved words */
 	If, Then,
 	While, Do,
-	Ret, Func, 
+	Ret, Func, Call, 
 	Var, Const, Odd,
 	Write, WriteLn,
+	Repeat, Until,
+	Else,
 	end_of_KeyWd,				/* The end of reserved words */
-	Plus, Minus,				/* Operators and delimiters */
+	Plus, Minus,				/* Operators and delimiters*/
 	Mult, Div,	
+	Apostrophe,
 	Lparen, Rparen,
+	Lbracket, Rbracket,
 	Equal, Lss, Gtr,
 	NotEq, LssEq, GtrEq, 
 	Comma, Period, Semicolon,
@@ -26,8 +31,13 @@ typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	end_of_KeySym,				/* The end of operators and delimiters */
 	Id, Num, nul,				/* Tokens */
 	end_of_Token,
-	letter, digit, colon, others		/* Other characters */
+	letter, digit, colon, character, others		/* Other characters */
 } KeyId;
+
+typedef struct type { /* For knowing what is the type of an expression, a term or a factor. */
+	KeyId keyId;
+	KindT kindT;
+}Type;
 
 typedef  struct  token {			/* The structure of tokens */
 	KeyId kind;				/* The kind of a token or the name of a key */
@@ -38,6 +48,11 @@ typedef  struct  token {			/* The structure of tokens */
 }Token;
 
 Token nextToken();				/* It returns the next token. */
+void skipChar();
+void setcTokenKind(KeyId k);
+void setcTokenValue(int value);
+Token getcToken();
+
 Token checkGet(Token t, KeyId k);	/* t.kind==k ? */
 	/* If t.kind==k, it returns the next token. */
 	/* If t.kind!=k, it declares an error. In addition, if both t and k are symbols or reserved words, */

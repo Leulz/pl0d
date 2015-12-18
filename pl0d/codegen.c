@@ -10,13 +10,19 @@
 #include "getSource.h"
 
 #define MAXCODE 200			/* The maximum length of codes */
-#define MAXMEM 2000			/* The maximum length of the stack */
+#define MAXMEM 20000			/* The maximum length of the stack */
 #define MAXREG 20			/* The maximum number of registers used at a time*/
 #define MAXLEVEL 5			/* The maximum block nesting level */
 
 typedef struct inst{				/* An instruction code */
 	OpCode  opCode;
 	union{
+		struct{
+			RelAddr addr;
+			union {
+				int arr[11], offset;
+			}u;
+		}arr;
 		RelAddr addr;
 		int value;
 		Operator optr;
@@ -67,6 +73,29 @@ int genCodeR()					/*　It generates a return code */
 	code[cIndex].opCode = ret;
 	code[cIndex].u.addr.level = bLevel();
 	code[cIndex].u.addr.addr = fPars();	/*　The number of parameters, which will be used to release a stack frame. */
+	return cIndex;
+}
+
+int genCodeArr(int arr[], int ti)
+{
+	checkMax();
+	code[cIndex].opCode = starr;
+	code[cIndex].u.arr.addr = relAddr(ti);
+	int arrSize = arr[0], i;
+	code[cIndex].u.arr.u.arr[0] = arrSize;
+	for (i = 1; i < arrSize + 1 && i < 11; ++i)
+	{
+		code[cIndex].u.arr.u.arr[i] = arr[i];
+	}
+	return cIndex;
+}
+
+int genCodeLarr(int arrIndex, int ti, OpCode op)
+{
+	checkMax();
+	code[cIndex].opCode = op;
+	code[cIndex].u.arr.addr = relAddr(ti);
+	code[cIndex].u.arr.u.offset = arrIndex + 1;
 	return cIndex;
 }
 
@@ -165,6 +194,7 @@ void printCode(int i)		/* It prints an instruction code in the address i. */
 		case greq: printf(",greq\n"); return;
 		case wrt: printf(",wrt\n"); return;
 		case wrl: printf(",wrl\n"); return;
+		case wrtc: printf(",wrtc\n"); return;
 		}
 	case 4:
 		printf(",L%3.3d\n", code[i].u.value);
@@ -174,7 +204,7 @@ void printCode(int i)		/* It prints an instruction code in the address i. */
 		printf(",L%3.3d\n", code[i].u.addr.addr);
 		return;
 	}
-}	
+}
 
 void execute()			/* It executes generated codes */
 {
@@ -194,14 +224,28 @@ void execute()			/* It executes generated codes */
 				break;
 		case lod: stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr]; 
 				 break;
+		case lodar:
+				 stack[top++] = stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + i.u.arr.u.offset]; 
+				 break;
 		case sto: stack[display[i.u.addr.level] + i.u.addr.addr] = stack[--top]; 
+				 break;
+		case starr:
+				  ;
+				  int arrSize = i.u.arr.u.arr[0], ind;
+				  stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr] = arrSize;
+				  for (ind = 1; ind < arrSize + 1 && arrSize < 11; ++ind)
+				  {
+				  	stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + ind] = i.u.arr.u.arr[ind];
+				  }
+				  break;
+		case stelar: stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + i.u.arr.u.offset] = stack[--top]; 
 				 break;
 		case cal: lev = i.u.addr.level +1;	/* The level of the name of a callee is i.u.addr.level */
 		  /* The level of the body of the callee is i.u.addr.level+1. */
 				stack[top] = display[lev]; 	/*　It preserves display[lev] in stack[top]　*/
 				stack[top+1] = pc; display[lev] = top; /* The stack frame of a callee starts at top. */
 				pc = i.u.addr.addr;
-				 break;
+				break;
 		case ret: temp = stack[--top];		/* It preserves a return value into a variable temp. */
 				top = display[i.u.addr.level];  	/* It restores top. */
 				display[i.u.addr.level] = stack[top];		/* It resotres a display. */
@@ -214,8 +258,9 @@ void execute()			/* It executes generated codes */
 					errorF("stack overflow");
 				break;
 		case jmp: pc = i.u.value; break;
-		case jpc: if (stack[--top] == 0)
+		case jpc: if (stack[--top] == 0) {
 					pc = i.u.value;
+				  }
 				break;
 		case opr: 
 			switch(i.u.optr){
@@ -232,6 +277,7 @@ void execute()			/* It executes generated codes */
 			case lseq: --top;  stack[top-1] = (stack[top-1] <= stack[top]); continue;
 			case greq: --top;  stack[top-1] = (stack[top-1] >= stack[top]); continue;
 			case wrt: printf("%d ", stack[--top]); continue;
+			case wrtc: printf("%c ", stack[--top] + '0'); continue;
 			case wrl: printf("\n"); continue;
 			}
 		}

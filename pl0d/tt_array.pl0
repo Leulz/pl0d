@@ -1,0 +1,13 @@
+const z=[23,24,25];
+var a;
+
+begin
+  write z[0];
+  writeln;
+  a:=[11,22,33,44,55,66,77,88];
+  write a[4];
+  writeln;
+  a[4]:=2+3;
+  write a[4];
+  writeln;
+end.

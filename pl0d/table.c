@@ -1,6 +1,6 @@
 
    /*********table.c**********/
-   
+#include <string.h>
 #ifndef TBL
 #define TBL
 #include "table.h"
@@ -10,24 +10,26 @@
 #define MAXTABLE 100		/* The maximum length of the name table */
 #define MAXNAME  31		/* The maximum length of names */
 #define MAXLEVEL 5		/* The maximum nesting block level */
+#define MAXARRAY 10
 
 typedef struct tableE {		/* The structure of elements in the name table */
 	KindT kind;			/* Kinds of names */
 	char name[MAXNAME];	/* The name */
 	union {
-		int value;			/* A value if it is a constant */
+		int value;			/* A value if it is an integer constant */
 		struct {
 			RelAddr raddr;	/*　The starting address if it is a function */
 			int pars;		/*　The number of parameters if it is a function */
 		}f;
 		RelAddr raddr;		/*　The address if it is a variable or a parameter */
+		int array[MAXARRAY + 1]; /* The array, if it is an array. The first value is the size of the array. */
 	}u;
 }TabelE;
 
 static TabelE nameTable[MAXTABLE];		/* The name table */
 static int tIndex = 0;			/*　An idex of the name table */
 static int level = -1;			/*　The current block level */
-static int index[MAXLEVEL];   	/* index[i] is the last index in the block level i */
+static int lastIndex[MAXLEVEL];   	/* index[i] is the last index in the block level i */
 static int addr[MAXLEVEL];    	/* addr[i] is the address of the last variable in the block level i */
 static int localAddr;			/* The address of the last variable in the current block */
 static int tfIndex;
@@ -52,7 +54,7 @@ void blockBegin(int firstAddr)	/* It is called when a block starts. */
 	}
 	if (level == MAXLEVEL-1)
 		errorF("too many nested blocks");
-	index[level] = tIndex;		/* It preserves information of the previous block. */
+	lastIndex[level] = tIndex;		/* It preserves information of the previous block. */
 	addr[level] = localAddr;
 	localAddr = firstAddr;		/* The address of the first variable in the new block */
 	level++;				/* The level of the new block */
@@ -62,7 +64,7 @@ void blockBegin(int firstAddr)	/* It is called when a block starts. */
 void blockEnd()				/* It is called when a block ends. */
 {
 	level--;
-	tIndex = index[level];		/* It restores information of one more outside block. */
+	tIndex = lastIndex[level];		/* It restores information of one more outside block. */
 	localAddr = addr[level];
 }
 
@@ -73,7 +75,7 @@ int bLevel()				/* It returns the level of the current block. */
 
 int fPars()					/* It returns the number of parameters of the current block. */
 {
-	return nameTable[index[level-1]].u.f.pars;
+	return nameTable[lastIndex[level-1]].u.f.pars;
 }
 
 void enterT(char *id)			/* It records a name id in the name table. */
@@ -109,15 +111,40 @@ int enterTvar(char *id)			/* It records a variable name in the name table. */
 	enterT(id);
 	nameTable[tIndex].kind = varId;
 	nameTable[tIndex].u.raddr.level = level;
-	nameTable[tIndex].u.raddr.addr = localAddr++;
+	if (localAddr == 2) { /* If it is the first variable in the main block */
+		nameTable[tIndex].u.raddr.addr = localAddr++;
+	} else {
+		nameTable[tIndex].u.raddr.addr = localAddr+= 11;		
+	}
 	return tIndex;
 }
 
-int enterTconst(char *id, int v)		/* It records a constant and its value in the name table. */
+int enterTconst(char *id, int v)		/* It records an integer constant and its value in the name table. */
 {
 	enterT(id);
 	nameTable[tIndex].kind = constId;
 	nameTable[tIndex].u.value = v;
+	return tIndex;
+}
+
+int enterTcharConst(char *id, int ch) /* It records a character constant and its character in the name table. */
+{
+	enterT(id);
+	nameTable[tIndex].kind = constCharId;
+	nameTable[tIndex].u.value = ch;
+	return tIndex;
+}
+
+int enterTarrayConst(char *id, int arr[], int arrSize)
+{
+	int i;
+	enterT(id);
+	nameTable[tIndex].kind = constArrayId;
+	nameTable[tIndex].u.array[0] = arrSize;
+	for (i = 1; i < arrSize + 1; ++i)
+	{
+		nameTable[tIndex].u.array[i] = arr[i - 1];
+	}
 	return tIndex;
 }
 
@@ -152,6 +179,21 @@ int searchT(char *id, KindT k)		/* It returns the index of an element whose name
 	}
 }
 
+int searchTbyId(char *id) /* It returns the index of an element whose name is id. Only used for searches, check 'searchT' */
+{
+	int i;
+	i = tIndex;
+	strcpy(nameTable[0].name, id);			/* It puts a sentinel at the beginning of the name table. */
+	while( strcmp(id, nameTable[i].name) )
+		i--;
+	if ( i )							/* It finds the name. */
+		return i;
+	else {							/* It fails to find the name. */
+		errorType("undef");
+		return -1;
+	}
+}
+
 KindT kindT(int i)				/* It returns the kind of the i-th element in the name table. */
 {
 	return nameTable[i].kind;
@@ -177,3 +219,32 @@ int frameL()				/* The maximum relative address of variables in a block */
 	return localAddr;
 }
 
+int getArrayElement(int ti, int arrayIndex)
+{
+	return nameTable[ti].u.array[arrayIndex + 1];
+}
+
+/*int getVarArrayElement(int ti, int arrayIndex)
+{
+	return nameTable[ti].u.v.array[arrayIndex + 1];
+}
+
+void setVarArrayElement(int ti, int arrayIndex, int value)
+{
+	nameTable[ti].u.v.array[arrayIndex + 1] = value;
+}
+
+void setVarArray(int ti, int arraySize, int array[])
+{
+	int i;
+	nameTable[ti].u.v.array[0] = arraySize;
+	for (i = 1; i < arraySize + 1; ++i)
+	{
+		nameTable[ti].u.v.array[i] = array[i-1];
+	}
+}*/
+
+void setKindT(int ti, KindT kind)
+{
+	nameTable[ti].kind = kind;
+}
