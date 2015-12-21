@@ -11,6 +11,7 @@
 
 #define MAXCODE 200			/* The maximum length of codes */
 #define MAXMEM 20000			/* The maximum length of the stack */
+#define MAXVAR 50
 #define MAXREG 20			/* The maximum number of registers used at a time*/
 #define MAXLEVEL 5			/* The maximum block nesting level */
 
@@ -210,35 +211,44 @@ void execute()			/* It executes generated codes */
 {
 	int stack[MAXMEM];		/* a stack */
 	int display[MAXLEVEL];	/* Starting addresses of stack frames of lexically visible blocks at the moment */
-	int pc, top, lev, temp;
+	Variable variables[MAXVAR];
+	int pc, top, lev, temp, curVar;
 	Inst i;					/* An instruction code to be executed */
 	printf("; start execution\n");
-	top = 0;  pc = 0;			/* top: a stack top where the next data will be pushed, pc: a program counter */
-	stack[0] = 0;  stack[1] = 0; 	/* stack[top] is a place to preserve a disply which will be overwritten by a callee. */
+	top = 0;  pc = 0; curVar = 0;			/* top: a stack top where the next data will be pushed, pc: a program counter */
+	stack[0] = 0;  stack[1] = 0; 	/* stack[top] is a place to preserve a display which will be overwritten by a callee. */
 	/* stack[top+1] is a place to record a return address to a caller. */
 	display[0] = 0;			/* The starting address of the main block is 0. */
 	do {
 		i = code[pc++];			/* It fetches an instruction code to be executed. */
 		switch(i.opCode){
+		case var: 
+			if(curVar>=49) {
+				errorF("too many variables");
+			} else {
+				variables[curVar].u.num = 0;
+				stack[display[i.u.addr.level] + i.u.addr.addr] = curVar++;
+			}
+			break;
 		case lit: stack[top++] = i.u.value; 
 				break;
-		case lod: stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr]; 
+		case lod: stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num; 
 				 break;
 		case lodar:
-				 stack[top++] = stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + i.u.arr.u.offset]; 
+				 stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[i.u.arr.u.offset];
 				 break;
-		case sto: stack[display[i.u.addr.level] + i.u.addr.addr] = stack[--top]; 
+		case sto: variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num = stack[--top]; 
 				 break;
 		case starr:
 				  ;
 				  int arrSize = i.u.arr.u.arr[0], ind;
-				  stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr] = arrSize;
+				  variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0] = arrSize;
 				  for (ind = 1; ind < arrSize + 1 && arrSize < 11; ++ind)
 				  {
-				  	stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + ind] = i.u.arr.u.arr[ind];
+				  	variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[ind] = i.u.arr.u.arr[ind];
 				  }
 				  break;
-		case stelar: stack[display[i.u.arr.addr.level] + i.u.arr.addr.addr + i.u.arr.u.offset] = stack[--top]; 
+		case stelar: variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[i.u.arr.u.offset] = stack[--top]; 
 				 break;
 		case cal: lev = i.u.addr.level +1;	/* The level of the name of a callee is i.u.addr.level */
 		  /* The level of the body of the callee is i.u.addr.level+1. */

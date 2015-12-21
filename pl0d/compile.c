@@ -11,7 +11,6 @@
 
 #define MINERROR 3			/* It will execute object codes if the number of errors in the compilation is less than MINERROR. */
 #define FIRSTADDR 2			/* The address of the first variable of each block. */
-#define MAXARRAY 10
 
 static Token token;				/* The next token */
 
@@ -201,7 +200,7 @@ void block(int pIndex)		/* pIndex is the index of the function name of this bloc
 	}			
 	backPatch(backP);			/* It adjusts the target address of the jmp to skip internal functions. */
 	changeV(pIndex, nextCode());	/* It adjusts the starting address of this function. */
-	genCodeV(ict, frameL() * 10);		/* A code to occupy the frame of this block on the stack. */
+	genCodeV(ict, frameL());		/* A code to occupy the frame of this block on the stack. */
 	statement();				/* The main statement of this block */		
 	genCodeR();				/* The return code */
 	blockEnd();				/* It declares the end of a block to the name table. */
@@ -277,7 +276,8 @@ void varDecl()				/* It compiles a variable declaration. */
 	while(1){
 		if (token.kind==Id){
 			setIdKind(varId);		/* It sets the kind of the token for printing. */
-			enterTvar(token.u.id);		/* It records the name of a variable in the name table whose address will be determined by the name table. */
+			int ti = enterTvar(token.u.id);		/* It records the name of a variable in the name table whose address will be determined by the name table. */
+			genCodeT(var, ti);
 			token = nextToken();
 		}else
 			errorMissingId();

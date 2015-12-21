@@ -2,12 +2,10 @@ const z=[23,24,25];
 var a;
 
 begin
-  write z[0];
+  a:=1;
+  write a;
   writeln;
-  a:=[11,22,33,44,55,66,77,88];
-  write a[4];
-  writeln;
-  a[4]:=2+3;
-  write a[4];
+  a:=[3,4,32];
+  write a[2];
   writeln;
 end.

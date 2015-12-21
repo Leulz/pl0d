@@ -10,7 +10,7 @@
 #define MAXTABLE 100		/* The maximum length of the name table */
 #define MAXNAME  31		/* The maximum length of names */
 #define MAXLEVEL 5		/* The maximum nesting block level */
-#define MAXARRAY 10
+#define MAXARRAY 11
 
 typedef struct tableE {		/* The structure of elements in the name table */
 	KindT kind;			/* Kinds of names */
@@ -22,7 +22,7 @@ typedef struct tableE {		/* The structure of elements in the name table */
 			int pars;		/*¡¡The number of parameters if it is a function */
 		}f;
 		RelAddr raddr;		/*¡¡The address if it is a variable or a parameter */
-		int array[MAXARRAY + 1]; /* The array, if it is an array. The first value is the size of the array. */
+		int array[MAXARRAY]; /* The array, if it is an array. The first value is the size of the array. */
 	}u;
 }TabelE;
 
@@ -111,11 +111,11 @@ int enterTvar(char *id)			/* It records a variable name in the name table. */
 	enterT(id);
 	nameTable[tIndex].kind = varId;
 	nameTable[tIndex].u.raddr.level = level;
-	if (localAddr == 2) { /* If it is the first variable in the main block */
-		nameTable[tIndex].u.raddr.addr = localAddr++;
-	} else {
+	nameTable[tIndex].u.raddr.addr = localAddr++;
+	//if (localAddr == 2) { /* If it is the first variable in the main block */
+	/*} else {
 		nameTable[tIndex].u.raddr.addr = localAddr+= 11;		
-	}
+	}*/
 	return tIndex;
 }
 

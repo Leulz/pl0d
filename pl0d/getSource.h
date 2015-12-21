@@ -7,7 +7,6 @@
 #endif
  
 #define MAXNAME 31			/* The maximum length of names */
-#define MAXARRAY 10         /* The maximum length of arrays */
  
 typedef  enum  keys {			/*¡¡Names of reserved words and characters */
 	Begin, End,				/* Reserved words */

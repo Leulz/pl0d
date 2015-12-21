@@ -1,14 +1,21 @@
 
    /******************** codegen.h ********************/
+#define MAXARRAY 11         /* The maximum length of arrays */
 
 typedef enum codes{			/* Constants for operation codes (opecodes) */
-	lit, opr, lod, sto, cal, ret, ict, jmp, jpc, starr, lodar, stelar
+	lit, opr, lod, sto, cal, ret, ict, jmp, jpc, starr, lodar, stelar, var
 }OpCode;
 
 typedef enum ops{			/* Constants for operators */
 	neg, add, sub, mul, div, odd, eq, ls, gr,
 	neq, lseq, greq, wrt, wrl, wrtc
 }Operator;
+
+typedef struct var{
+	union {
+		int num, arr[MAXARRAY];
+	}u;
+}Variable;
 
 int genCodeV(OpCode op, int v);		/* It generates a code with an address v. e.g. jmp, jpc and so on. */
 int genCodeT(OpCode op, int ti);		/* It generates a code with an operand pointed by an index ti in the name table. e.g. lod, sto, and cal.*/
