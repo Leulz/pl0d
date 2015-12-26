@@ -350,6 +350,7 @@ void errorMessage(char *m)	/* It outputs an error message to the html (or tex) f
 void errorF(char *m)			/* It outputs a fatal error and gives up the compilation. */
 {
 	errorMessage(m);
+	printf("fatal error: %s\n", m);
 #if defined(LATEX)
 	fprintf(fptex, "fatal errors\n\\end{document}\n");
 #elif defined(TOKEN_HTML)

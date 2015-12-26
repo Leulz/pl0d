@@ -178,18 +178,31 @@ int compile()
 	return i<MINERROR;		/* Is the number of error messages acceptable so as to execute the object code? */
 }
 
+//Makes non-function declarations separately, since function declarations should be skipped when the code is being executed.
+void declarations()
+{
+	while (1) {
+		switch (token.kind) {
+			case Const:			/* A constant declaration */
+				token = nextToken();
+				constDecl(); continue;
+			case Var:				/* A variable declaration */
+				token = nextToken();
+				varDecl(); continue;
+			default:
+				break;
+		}
+		break;
+	}
+}
+
 void block(int pIndex)		/* pIndex is the index of the function name of this block */
 {
 	int backP;
+	declarations();
 	backP = genCodeV(jmp, 0);		/* It generates a jmp to skip internal functions. The address will be adjusted by backpatch. */
 	while (1) {				/* It repeatedly compiles declarations. */
 		switch (token.kind){
-		case Const:			/* A constant declaration */
-			token = nextToken();
-			constDecl(); continue;
-		case Var:				/* A variable declaration */
-			token = nextToken();
-			varDecl(); continue;
 		case Func:				/* A function declaration */
 			token = nextToken();
 			funcDecl(); continue;
@@ -199,6 +212,7 @@ void block(int pIndex)		/* pIndex is the index of the function name of this bloc
 		break;
 	}			
 	backPatch(backP);			/* It adjusts the target address of the jmp to skip internal functions. */
+	declarations();
 	changeV(pIndex, nextCode());	/* It adjusts the starting address of this function. */
 	genCodeV(ict, frameL());		/* A code to occupy the frame of this block on the stack. */
 	statement();				/* The main statement of this block */		
@@ -281,7 +295,7 @@ void varDecl()				/* It compiles a variable declaration. */
 			token = nextToken();
 		}else
 			errorMissingId();
-		if (token.kind!=Comma){		/* If the next token is a commna, it will be followed by a variable declaration. */
+		if (token.kind!=Comma){		/* If the next token is a comma, it will be followed by a variable declaration. */
 			if (token.kind==Id){	/* If the next token is a name, it assumes there must be a comma. */
 				errorInsert(Comma);
 				continue;
@@ -349,11 +363,11 @@ void statement()			/* It compiles a statement. */
 			token = nextToken();
 			if (token.kind == Lbracket) {
 				token = nextToken();
-				int arrayIndex = token.u.value;
-				token = checkGet(nextToken(), Rbracket);
+				expression();
+				token = checkGet(token, Rbracket);
 				token = checkGet(token, Assign);
 				expression();
-				genCodeLarr(arrayIndex, tIndex, stelar);
+				genCodeLarr(tIndex, stelar);
 			} else {
 				token = checkGet(token, Assign);
 				if (token.kind == Lbracket) {
@@ -584,15 +598,13 @@ Type factor()					/* It compiles a factor of an expression. */
 			genCodeT(lod, tIndex);
 			token = nextToken(); break;
 		case varArrayId:
-			//TODO check if the index is bigger than 9
 			;
 			temp = token;
 			token = checkGet(nextToken(), Lbracket);
 			tIndex = searchT(temp.u.id, varArrayId);
-			genCodeLarr(token.u.value, tIndex, lodar);
-			/*arrayElement = getVarArrayElement(tIndex, token.u.value);
-			genCodeV(lit, arrayElement);*/
-			token = checkGet(nextToken(), Rbracket);
+			expression();
+			genCodeLarr(tIndex, lodar);
+			token = checkGet(token, Rbracket);
 			break;
 		case constId:					/* The name of a constant */
 			genCodeV(lit, val(tIndex));

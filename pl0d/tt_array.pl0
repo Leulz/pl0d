@@ -1,11 +1,7 @@
-const z=[23,24,25];
-var a;
+var a, b;
 
 begin
-  a:=1;
-  write a;
-  writeln;
-  a:=[3,4,32];
-  write a[2];
-  writeln;
+  a:=[3,4,32,33];
+  b:=0;
+  while b < 4 do begin write a[b]; writeln; b = b + 1; end
 end.

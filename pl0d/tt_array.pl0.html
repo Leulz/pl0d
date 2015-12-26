@@ -5,16 +5,12 @@
 <BODY>
 <PRE>
 
-(Keyword, 'const')  (constId, 'z') (Symbol, '=') (Symbol, '[') (number, '23') (Symbol, ',') (number, '24') (Symbol, ',') (number, '25') (Symbol, ']') (Symbol, ';') 
-(Keyword, 'var')  (varId, 'a') (Symbol, ';') 
+(Keyword, 'var')  (varId, 'a') (Symbol, ',')  (varId, 'b') (Symbol, ';') 
 
 (Keyword, 'begin') 
-  (varId, 'a') (Symbol, ':=') (number, '1') (Symbol, ';') 
-  (Keyword, 'write')  (varId, 'a') (Symbol, ';') 
-  (Keyword, 'writeln') (Symbol, ';') 
-  (varId, 'a') (Symbol, ':=') (Symbol, '[') (number, '3') (Symbol, ',') (number, '4') (Symbol, ',') (number, '32') (Symbol, ']') (Symbol, ';') 
-  (Keyword, 'write')  (Symbol, '[') (number, '2') (Symbol, ']') (Symbol, ';') 
-  (Keyword, 'writeln') (Symbol, ';') 
+  (varId, 'a') (Symbol, ':=') (Symbol, '[') (number, '3') (Symbol, ',') (number, '4') (Symbol, ',') (number, '32') (Symbol, ',') (number, '33') (Symbol, ']') (Symbol, ';') 
+  (varId, 'b') (Symbol, ':=') (number, '0') (Symbol, ';') 
+  (Keyword, 'while')  (varId, 'b')  (Symbol, '<')  (number, '4')  (Keyword, 'do')  (Keyword, 'begin')  (Keyword, 'write')  (Symbol, '[') (varId, 'b') (Symbol, ']') (Symbol, ';')  (Keyword, 'writeln') (Symbol, ';')  (varId, 'b')  <FONT COLOR=#FF0000>delete (Symbol, '=')</FONT><FONT COLOR=#0000FF>insert (Symbol, ':=')</FONT> (varId, 'b')  (Symbol, '+')  (number, '1') (Symbol, ';')  (Keyword, 'end') 
 (Keyword, 'end') (Symbol, '.') 
 </PRE>
 </BODY>

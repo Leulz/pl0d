@@ -91,12 +91,11 @@ int genCodeArr(int arr[], int ti)
 	return cIndex;
 }
 
-int genCodeLarr(int arrIndex, int ti, OpCode op)
+int genCodeLarr(int ti, OpCode op)
 {
 	checkMax();
 	code[cIndex].opCode = op;
 	code[cIndex].u.arr.addr = relAddr(ti);
-	code[cIndex].u.arr.u.offset = arrIndex + 1;
 	return cIndex;
 }
 
@@ -222,7 +221,7 @@ void execute()			/* It executes generated codes */
 	do {
 		i = code[pc++];			/* It fetches an instruction code to be executed. */
 		switch(i.opCode){
-		case var: 
+		case var:
 			if(curVar>=49) {
 				errorF("too many variables");
 			} else {
@@ -233,23 +232,32 @@ void execute()			/* It executes generated codes */
 		case lit: stack[top++] = i.u.value; 
 				break;
 		case lod: stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num; 
-				 break;
+				break;
 		case lodar:
-				 stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[i.u.arr.u.offset];
-				 break;
+				if(stack[top-1]>=variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0]){
+					errorF("index bigger than array size, core dumped");
+				}
+				temp = top;
+				stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[stack[temp-1]+1];
+				break;
 		case sto: variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num = stack[--top]; 
-				 break;
+				break;
 		case starr:
-				  ;
-				  int arrSize = i.u.arr.u.arr[0], ind;
-				  variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0] = arrSize;
-				  for (ind = 1; ind < arrSize + 1 && arrSize < 11; ++ind)
-				  {
-				  	variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[ind] = i.u.arr.u.arr[ind];
-				  }
-				  break;
-		case stelar: variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[i.u.arr.u.offset] = stack[--top]; 
-				 break;
+				;
+				int arrSize = i.u.arr.u.arr[0], ind;
+				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0] = arrSize;
+				for (ind = 1; ind < arrSize + 1 && arrSize < 11; ++ind)
+				{
+					variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[ind] = i.u.arr.u.arr[ind];
+				}
+				break;
+		case stelar: 
+				if(stack[top-1]>=variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0]) {
+					errorF("index bigger than array size, core dumped");
+				}
+				temp = top;
+				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[stack[temp-1]+1] = stack[--top]; 
+				break;
 		case cal: lev = i.u.addr.level +1;	/* The level of the name of a callee is i.u.addr.level */
 		  /* The level of the body of the callee is i.u.addr.level+1. */
 				stack[top] = display[lev]; 	/*¡¡It preserves display[lev] in stack[top]¡¡*/
