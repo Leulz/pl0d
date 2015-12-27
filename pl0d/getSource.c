@@ -15,6 +15,7 @@
 #define TYPE_C  "#00FF00"  /* The color for type errors */
 
 static FILE *fpi;				/* a source file */
+static FILE *fpvar;				/* a source file to be parsed separately, due to variable initialization */
 static FILE *fptex;			/* an output file (html or tex) */
 static char line[MAXLINE];	/* An input buffer for one line */
 static int lineIndex;			/* The place of the next character in the input buffer. */
@@ -122,6 +123,10 @@ int openSource(char fileName[]) 		/* It opens a source file. */
 		printf("can't open %s\n", fileName);
 		return 0;
 	}
+	if ( (fpvar = fopen(fileName,"r")) == NULL ) {
+		printf("PARSING VARS: can't open %s\n", fileName);
+		return 0;
+	}
 	strcpy(fileNameO, fileName);
 #if defined(LATEX)
 	strcat(fileNameO,".tex");
@@ -140,6 +145,7 @@ int openSource(char fileName[]) 		/* It opens a source file. */
 void closeSource()				 /* It closes a source file and the html (or tex) file. */
 {
 	fclose(fpi);
+	fclose(fpvar);
 	fclose(fptex);
 }
 

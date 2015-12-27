@@ -3,7 +3,7 @@
 #define MAXARRAY 11         /* The maximum length of arrays */
 
 typedef enum codes{			/* Constants for operation codes (opecodes) */
-	lit, opr, lod, sto, cal, ret, ict, jmp, jpc, starr, lodar, stelar, var
+	lit, opr, lod, lodpar, sto, cal, ret, ict, jmp, jpc, starr, lodar, stelar, var
 }OpCode;
 
 typedef enum ops{			/* Constants for operators */

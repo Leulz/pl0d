@@ -222,6 +222,7 @@ void execute()			/* It executes generated codes */
 		i = code[pc++];			/* It fetches an instruction code to be executed. */
 		switch(i.opCode){
 		case var:
+		printf("INSTRUCTION VAR\n");
 			if(curVar>=49) {
 				errorF("too many variables");
 			} else {
@@ -231,7 +232,18 @@ void execute()			/* It executes generated codes */
 			break;
 		case lit: stack[top++] = i.u.value; 
 				break;
-		case lod: stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num; 
+		case lodpar:
+				stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr];
+				break;
+		case lod: 
+				printf("LOD variable is %d\n", variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num);
+				//printf("display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
+				//printf("i.u.addr.level is %d\n", i.u.addr.level);
+				//printf("i.u.addr.addr is %d\n", i.u.addr.addr);
+				printf("LOD display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
+				printf("LOD i.u.addr.addr is %d\n", i.u.addr.addr);
+				printf("LOD stack[display[i.u.addr.level] + i.u.addr.addr] is %d\n\n", stack[display[i.u.addr.level] + i.u.addr.addr]);
+				stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num;
 				break;
 		case lodar:
 				if(stack[top-1]>=variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0]){
@@ -240,7 +252,12 @@ void execute()			/* It executes generated codes */
 				temp = top;
 				stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[stack[temp-1]+1];
 				break;
-		case sto: variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num = stack[--top]; 
+		case sto:
+				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num = stack[--top]; 
+				printf("STO variable is %d\n", variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num);
+				printf("STO display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
+				printf("STO i.u.addr.addr is %d\n", i.u.addr.addr);
+				printf("STO stack[display[i.u.addr.level] + i.u.addr.addr] is %d\n\n", stack[display[i.u.addr.level] + i.u.addr.addr]);
 				break;
 		case starr:
 				;

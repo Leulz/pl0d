@@ -112,10 +112,6 @@ int enterTvar(char *id)			/* It records a variable name in the name table. */
 	nameTable[tIndex].kind = varId;
 	nameTable[tIndex].u.raddr.level = level;
 	nameTable[tIndex].u.raddr.addr = localAddr++;
-	//if (localAddr == 2) { /* If it is the first variable in the main block */
-	/*} else {
-		nameTable[tIndex].u.raddr.addr = localAddr+= 11;		
-	}*/
 	return tIndex;
 }
 
@@ -154,7 +150,9 @@ void endpar()					/* It is called when parameters end. */
 	int pars = nameTable[tfIndex].u.f.pars;
 	if (pars == 0)  return;
 	for (i=1; i<=pars; i++)			/* It calculates relative addresses of parameters. */
-		 nameTable[tfIndex+i].u.raddr.addr = i-1-pars;
+	{
+		nameTable[tfIndex+i].u.raddr.addr = i-1-pars;
+	}
 }
 
 void changeV(int ti, int newVal)		/* It changes the value of the ti-th element in the name table (the starting address of a function) */

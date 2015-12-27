@@ -1,0 +1,26 @@
+ function multiply(x, y)
+     var a,b,c;
+    begin
+      a:=x; b:=y; c:=0;
+      write 'C'; writeln; write a + b; writeln;
+      while b>0 do
+        begin
+          if odd b then c:=c+a;
+          a:=2*a; b:=b/2;
+        end;
+      return c;
+    end; 
+
+const q=11;
+var d, e, f;
+
+begin
+  d:=[11,22,33,44,55,66,77,88];
+  e:=q;
+  write e;
+  writeln;
+  f:=e;
+  write 'Q'; writeln; write e; writeln;
+  write 'W'; writeln; write f; writeln;
+  write multiply(e,f);
+end.
