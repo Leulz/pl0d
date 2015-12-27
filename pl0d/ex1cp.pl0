@@ -12,15 +12,18 @@
     end; 
 
 const q=11;
-var d, e, f;
+var a, e, b;
 
 begin
-  d:=[11,22,33,44,55,66,77,88];
+  a:=[11,22,33,44,55,66,77,88];
   e:=q;
   write e;
   writeln;
-  f:=e;
+  b:=e;
   write 'Q'; writeln; write e; writeln;
-  write 'W'; writeln; write f; writeln;
-  write multiply(e,f);
+  write 'W'; writeln; write b; writeln;
+  write multiply(30, 30);
+  writeln;
+  write 'A'; writeln; write a[3]; writeln;
+  write 'B'; writeln; write b; writeln;
 end.

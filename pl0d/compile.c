@@ -122,13 +122,6 @@ char* getKeyIdName(KeyId k)
 	}
 }
 
-//Parses the whole program, initializing all variables independently from where they are.
-//Must be done since this implementation is dynamically typed.
-void parseVariables()
-{
-	
-}
-
 int compile()
 {
 	int i;
@@ -136,7 +129,6 @@ int compile()
 	initSource();				/* Initialization for getSource */
 	token = nextToken();			/* The first token */
 	blockBegin(FIRSTADDR);		/* A new block starts. */
-	parseVariables();
 	block(0);					/* The constatnt "0" is a dummy. (The main block does not have any function name.) */
 	finalSource();
 	i = errorN();				/* The number of error messages */

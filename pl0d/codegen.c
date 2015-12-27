@@ -11,7 +11,7 @@
 
 #define MAXCODE 200			/* The maximum length of codes */
 #define MAXMEM 20000			/* The maximum length of the stack */
-#define MAXVAR 50
+#define MAXVAR 51
 #define MAXREG 20			/* The maximum number of registers used at a time*/
 #define MAXLEVEL 5			/* The maximum block nesting level */
 
@@ -210,11 +210,11 @@ void execute()			/* It executes generated codes */
 {
 	int stack[MAXMEM];		/* a stack */
 	int display[MAXLEVEL];	/* Starting addresses of stack frames of lexically visible blocks at the moment */
-	Variable variables[MAXVAR];
+	Variable variables[MAXVAR]; /* variables[0] is supposed to be never used */
 	int pc, top, lev, temp, curVar;
 	Inst i;					/* An instruction code to be executed */
 	printf("; start execution\n");
-	top = 0;  pc = 0; curVar = 0;			/* top: a stack top where the next data will be pushed, pc: a program counter */
+	top = 0;  pc = 0; curVar = 1;			/* top: a stack top where the next data will be pushed, pc: a program counter */
 	stack[0] = 0;  stack[1] = 0; 	/* stack[top] is a place to preserve a display which will be overwritten by a callee. */
 	/* stack[top+1] is a place to record a return address to a caller. */
 	display[0] = 0;			/* The starting address of the main block is 0. */
@@ -223,26 +223,30 @@ void execute()			/* It executes generated codes */
 		switch(i.opCode){
 		case var:
 		printf("INSTRUCTION VAR\n");
-			if(curVar>=49) {
+			if(curVar>=50) {
 				errorF("too many variables");
 			} else {
 				variables[curVar].u.num = 0;
 				stack[display[i.u.addr.level] + i.u.addr.addr] = curVar++;
 			}
 			break;
-		case lit: stack[top++] = i.u.value; 
+		case lit: stack[top++] = i.u.value;
 				break;
 		case lodpar:
 				stack[top++] = stack[display[i.u.addr.level] + i.u.addr.addr];
 				break;
-		case lod: 
-				printf("LOD variable is %d\n", variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num);
+		case lod:
+				if (stack[display[i.u.addr.level] + i.u.addr.addr] == 0) {
+					variables[curVar].u.num = 0;
+					stack[display[i.u.addr.level] + i.u.addr.addr] = curVar++;
+				}
+				//printf("LOD variable is %d\n", variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num);
 				//printf("display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
 				//printf("i.u.addr.level is %d\n", i.u.addr.level);
 				//printf("i.u.addr.addr is %d\n", i.u.addr.addr);
-				printf("LOD display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
+				/*printf("LOD display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
 				printf("LOD i.u.addr.addr is %d\n", i.u.addr.addr);
-				printf("LOD stack[display[i.u.addr.level] + i.u.addr.addr] is %d\n\n", stack[display[i.u.addr.level] + i.u.addr.addr]);
+				printf("LOD stack[display[i.u.addr.level] + i.u.addr.addr] is %d\n\n", stack[display[i.u.addr.level] + i.u.addr.addr]);*/
 				stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num;
 				break;
 		case lodar:
@@ -253,11 +257,15 @@ void execute()			/* It executes generated codes */
 				stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[stack[temp-1]+1];
 				break;
 		case sto:
+				if (stack[display[i.u.addr.level] + i.u.addr.addr] == 0) {
+					variables[curVar].u.num = 0;
+					stack[display[i.u.addr.level] + i.u.addr.addr] = curVar++;
+				}
 				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num = stack[--top]; 
-				printf("STO variable is %d\n", variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num);
+				/*printf("STO variable is %d\n", variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num);
 				printf("STO display[i.u.addr.level] is %d\n", display[i.u.addr.level]);
 				printf("STO i.u.addr.addr is %d\n", i.u.addr.addr);
-				printf("STO stack[display[i.u.addr.level] + i.u.addr.addr] is %d\n\n", stack[display[i.u.addr.level] + i.u.addr.addr]);
+				printf("STO stack[display[i.u.addr.level] + i.u.addr.addr] is %d\n\n", stack[display[i.u.addr.level] + i.u.addr.addr]);*/
 				break;
 		case starr:
 				;
