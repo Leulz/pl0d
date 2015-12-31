@@ -6,7 +6,7 @@
       write 'A'; writeln; write a; writeln;
       write 'B'; writeln; write b; writeln;
       write 'C'; writeln; write c; writeln;
-      return c;
+      return 12;
     end; 
 
 const q=11;

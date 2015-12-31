@@ -333,11 +333,13 @@ void statement()			/* It compiles a statement. */
 				if (token.kind == Lbracket) {
 					setKindT(tIndex, varArrayId);
 					token = nextToken();
-					int arraySize = 1, array[MAXARRAY], switchFlag = 0;
+					int arraySize = 1, switchFlag = 0;
 					while(1 && !switchFlag) {
 						switch(token.kind) {
-							case Num:
-								array[arraySize++] = token.u.value;
+							case Num: case Id:
+								arraySize++;
+								expression();
+								continue;
 							case Comma:
 								token = nextToken();
 								continue;
@@ -347,8 +349,8 @@ void statement()			/* It compiles a statement. */
 								break;
 						}
 					}
-					array[0] = arraySize - 1;
-					genCodeArr(array, tIndex);
+					genCodeV(lit, arraySize - 1);
+					genCodeT(starr, tIndex);
 				} else {
 					Type type = expression();					/* It compiles an expression. */
 					if (type.keyId == character) {

@@ -9,6 +9,8 @@
 #endif
 #include "getSource.h"
 
+#define min(a,b) a < b ? a : b;
+
 #define MAXCODE 200			/* The maximum length of codes */
 #define MAXMEM 20000			/* The maximum length of the stack */
 #define MAXVAR 51
@@ -18,12 +20,6 @@
 typedef struct inst{				/* An instruction code */
 	OpCode  opCode;
 	union{
-		struct{
-			RelAddr addr;
-			union {
-				int arr[11], offset;
-			}u;
-		}arr;
 		RelAddr addr;
 		int value;
 		Operator optr;
@@ -77,25 +73,11 @@ int genCodeR()					/*¡¡It generates a return code */
 	return cIndex;
 }
 
-int genCodeArr(int arr[], int ti)
-{
-	checkMax();
-	code[cIndex].opCode = starr;
-	code[cIndex].u.arr.addr = relAddr(ti);
-	int arrSize = arr[0], i;
-	code[cIndex].u.arr.u.arr[0] = arrSize;
-	for (i = 1; i < arrSize + 1 && i < 11; ++i)
-	{
-		code[cIndex].u.arr.u.arr[i] = arr[i];
-	}
-	return cIndex;
-}
-
 int genCodeLarr(int ti, OpCode op)
 {
 	checkMax();
 	code[cIndex].opCode = op;
-	code[cIndex].u.arr.addr = relAddr(ti);
+	code[cIndex].u.addr = relAddr(ti);
 	return cIndex;
 }
 
@@ -222,7 +204,6 @@ void execute()			/* It executes generated codes */
 		i = code[pc++];			/* It fetches an instruction code to be executed. */
 		switch(i.opCode){
 		case var:
-		printf("INSTRUCTION VAR\n");
 			if(curVar>=50) {
 				errorF("too many variables");
 			} else {
@@ -269,11 +250,12 @@ void execute()			/* It executes generated codes */
 				break;
 		case starr:
 				;
-				int arrSize = i.u.arr.u.arr[0], ind;
+				int arrSize = stack[top-1], ind;
+				arrSize = min(10, arrSize);
 				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0] = arrSize;
-				for (ind = 1; ind < arrSize + 1 && arrSize < 11; ++ind)
+				for (ind = 0; ind < arrSize; ind++)
 				{
-					variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[ind] = i.u.arr.u.arr[ind];
+					variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[arrSize-ind] = stack[top-ind-2];
 				}
 				break;
 		case stelar: 
