@@ -266,7 +266,6 @@ void varDecl()				/* It compiles a variable declaration. */
 	token = checkGet(token, Semicolon);		/* It must end with ";". */
 }
 
-//FIXME function parameters have problems
 void funcDecl()			/* It compiles a function declaration. */
 {
 	int fIndex;
@@ -333,12 +332,14 @@ void statement()			/* It compiles a statement. */
 				if (token.kind == Lbracket) {
 					setKindT(tIndex, varArrayId);
 					token = nextToken();
-					int arraySize = 1, switchFlag = 0;
+					int arraySize = 0, switchFlag = 0;
 					while(1 && !switchFlag) {
 						switch(token.kind) {
 							case Num: case Id:
 								arraySize++;
-								expression();
+								if (arraySize <= 10) {
+									expression();
+								}
 								continue;
 							case Comma:
 								token = nextToken();
@@ -349,8 +350,11 @@ void statement()			/* It compiles a statement. */
 								break;
 						}
 					}
-					genCodeV(lit, arraySize - 1);
+					genCodeV(lit, arraySize);
 					genCodeT(starr, tIndex);
+					if (arraySize > 10) {
+						errorMessage("array is too big, only first 10 elements considered");
+					}
 				} else {
 					Type type = expression();					/* It compiles an expression. */
 					if (type.keyId == character) {
@@ -494,7 +498,7 @@ int isStBeginKey(Token t)			/* Is a token t one of starting tokens of statements
 {
 	switch (t.kind){
 	case Id:
-	case If: case Begin: case Ret:
+	case If: case Begin: case Ret: case Do: case Repeat:
 	case While: case Write: case WriteLn:
 		return 1;
 	default:

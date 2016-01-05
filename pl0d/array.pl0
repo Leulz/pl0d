@@ -1,5 +1,12 @@
-
-begin
-write 2;
-end
-end.
+const constArr=[10,20,30];
+var varArr, temp;
+	begin
+	write constArr[1]; writeln; writeln;
+	varArr := [31,12,53];
+	temp :=0;
+	while temp<3 do
+		begin
+			write varArr[temp]; writeln;
+			temp := temp + 1;
+		end;
+	end.

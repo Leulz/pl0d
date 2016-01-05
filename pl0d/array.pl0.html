@@ -5,10 +5,18 @@
 <BODY>
 <PRE>
 
-
-(Keyword, 'begin') 
-(Keyword, 'write')  (number, '2') (Symbol, ';') 
-(Keyword, 'end') <FONT COLOR=#0000FF>insert (Symbol, '.')</FONT>
+(Keyword, 'const')  (constId, 'constArr') (Symbol, '=') (Symbol, '[') (number, '10') (Symbol, ',') (number, '20') (Symbol, ',') (number, '30') (Symbol, ']') (Symbol, ';') 
+(Keyword, 'var')  (varId, 'varArr') (Symbol, ',')  (varId, 'temp') (Symbol, ';') 
+     (Keyword, 'begin') 
+     (Keyword, 'write')  (Symbol, '[') (number, '1') (Symbol, ']') (Symbol, ';')  (Keyword, 'writeln') (Symbol, ';')  (Keyword, 'writeln') (Symbol, ';') 
+     (varId, 'varArr')  (Symbol, ':=')  (Symbol, '[') (number, '31') (Symbol, ',') (number, '12') (Symbol, ',') (number, '53') (Symbol, ']') (Symbol, ';') 
+     (varId, 'temp')  (Symbol, ':=') (number, '0') (Symbol, ';') 
+     (Keyword, 'while')  (varId, 'temp') (Symbol, '<') (number, '3')  (Keyword, 'do') 
+          (Keyword, 'begin') 
+               (Keyword, 'write')  (Symbol, '[') (varId, 'temp') (Symbol, ']') (Symbol, ';')  (Keyword, 'writeln') (Symbol, ';') 
+               (varId, 'temp')  (Symbol, ':=')  (varId, 'temp')  (Symbol, '+')  (number, '1') (Symbol, ';') 
+          (Keyword, 'end') (Symbol, ';') 
+     (Keyword, 'end') (Symbol, '.') 
 </PRE>
 </BODY>
 </HTML>
