@@ -1,0 +1,3 @@
+Constant arrays are very limited. Their elements have to be numbers (not expressions) and, when accessing an element, you have to put a number as the index, never an expression. For complex arrays that accept expressions on declaration and when accessing their elements, use variables, not constants.
+
+The idea I implemented was the type char. An example exists within the file char.pl0.

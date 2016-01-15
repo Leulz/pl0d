@@ -200,11 +200,15 @@ void constDecl()			/* It compiles a constant declaration. */
 				case Lbracket:
 					arrayFlag = 1;
 					token = nextToken();
-					int arraySize = 0, array[MAXARRAY], switchFlag = 0;
+					int arraySize = 0, array[10], switchFlag = 0;
 					while(1 && !switchFlag) {
 						switch(token.kind) {
 							case Num:
-								array[arraySize++] = token.u.value;
+								if(arraySize < 10) {
+									array[arraySize++] = token.u.value;
+								} else {
+									arraySize++;
+								}
 							case Comma:
 								token = nextToken();
 								continue;
@@ -215,6 +219,9 @@ void constDecl()			/* It compiles a constant declaration. */
 						}
 					}
 					enterTarrayConst(temp.u.id, array, arraySize);
+					if (arraySize > 10){
+						errorMessage("array is too big. only first 10 elements considered");
+					}
 					break;
 				default:
 					errorType("number nor char");
@@ -339,6 +346,13 @@ void statement()			/* It compiles a statement. */
 								arraySize++;
 								if (arraySize <= 10) {
 									expression();
+								} else {
+									while(1) {
+										token = nextToken();
+										if (token.kind == Rbracket || token.kind == Semicolon) {
+											break;
+										}
+									}
 								}
 								continue;
 							case Comma:
@@ -499,7 +513,7 @@ int isStBeginKey(Token t)			/* Is a token t one of starting tokens of statements
 	switch (t.kind){
 	case Id:
 	case If: case Begin: case Ret: case Do: case Repeat:
-	case While: case Write: case WriteLn:
+	case While: case Write: case WriteLn: case Call:
 		return 1;
 	default:
 		return 0;
@@ -585,6 +599,9 @@ Type factor()					/* It compiles a factor of an expression. */
 			;
 			temp = token;
 			token = checkGet(nextToken(), Lbracket);
+			if (token.u.value > 9) {
+				errorF("index bigger than array size, core dumped");
+			}
 			tIndex = searchT(temp.u.id, constArrayId);
 			arrayElement = getArrayElement(tIndex, token.u.value);
 			genCodeV(lit, arrayElement);

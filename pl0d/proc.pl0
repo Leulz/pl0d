@@ -1,8 +1,8 @@
- function print_sum(x, y)
+ function printSum(x, y)
     begin
       write x + y; writeln;
     end; 
 
 begin
-  call print_sum(3,5);
+  call printSum(3,5);
 end.

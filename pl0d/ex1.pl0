@@ -3,14 +3,12 @@
     begin
       a:=x;
       b:=y;
-      write 'A'; writeln; write a; writeln;
-      write 'B'; writeln; write b; writeln;
-      write 'C'; writeln; write c; writeln;
-      return 12;
+      return a * b;
     end; 
-
-const q=11;
+const a=12;
+var x;
 begin
-  write multiply(10,15);
+  x := 10;
+  write multiply(a,x);
   writeln;
 end.

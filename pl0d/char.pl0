@@ -1,0 +1,8 @@
+var x,y,z;
+begin
+	x := 'L';
+	y := 'E';
+	z := 'O';
+
+	write x; write y; write z; writeln;
+end.

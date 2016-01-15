@@ -224,6 +224,10 @@ void execute()			/* It executes generated codes */
 				stack[top++] = variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num;
 				break;
 		case lodar:
+				if (stack[display[i.u.addr.level] + i.u.addr.addr] == 0) {
+					variables[curVar].u.num = 0;
+					stack[display[i.u.addr.level] + i.u.addr.addr] = curVar++;
+				}
 				if(stack[top-1]>=variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0]){
 					errorF("index bigger than array size, core dumped");
 				}
@@ -238,7 +242,10 @@ void execute()			/* It executes generated codes */
 				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.num = stack[--top]; 
 				break;
 		case starr:
-				;
+				if (stack[display[i.u.addr.level] + i.u.addr.addr] == 0) {
+					variables[curVar].u.num = 0;
+					stack[display[i.u.addr.level] + i.u.addr.addr] = curVar++;
+				}
 				int arrSize = stack[top-1], ind;
 				arrSize = min(10, arrSize);
 				variables[stack[display[i.u.addr.level] + i.u.addr.addr]].u.arr[0] = arrSize;
